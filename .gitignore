@@ -1,0 +1,29 @@
+# Configuration with sensitive secrets
+config/config.json
+.env
+*.env
+*.secret
+
+# Binary and shortcut files
+tools/rclone.exe
+*.exe
+*.lnk
+
+# Local generated dashboard and runtime outputs
+Dashboard.html
+logs/
+*.log
+sync_log.txt
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE and OS files
+.vscode/
+.history/
+.idea/
+Thumbs.db
+Desktop.ini
+scratch_drive_sim/

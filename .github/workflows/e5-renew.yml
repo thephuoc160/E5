@@ -1,0 +1,39 @@
+name: Microsoft 365 E5 Auto Renew Activity
+
+on:
+  schedule:
+    # Chạy định kỳ 2 lần / mỗi 2 ngày (03:25 UTC và 15:25 UTC)
+    - cron: '25 3,15 */2 * *'
+  workflow_dispatch: # Cho phép nhấn nút "Run workflow" thủ công bất kỳ lúc nào trên GitHub UI
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/scripts/**'
+
+jobs:
+  renew-activity:
+    name: Execute Microsoft Graph Cloud Activities
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Set up Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run E5 Cloud Activity Generator
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          USER_PRINCIPAL_NAME: ${{ secrets.USER_PRINCIPAL_NAME }}
+          TEAMS_TEAM_ID: ${{ secrets.TEAMS_TEAM_ID }}
+          TEAMS_CHANNEL_ID: ${{ secrets.TEAMS_CHANNEL_ID }}
+          PLANNER_PLAN_ID: ${{ secrets.PLANNER_PLAN_ID }}
+        run: |
+          python .github/scripts/e5_cloud_runner.py

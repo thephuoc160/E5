@@ -1,0 +1,60 @@
+{
+  "azure": {
+    "tenantId": "YOUR_TENANT_ID_HERE",
+    "clientId": "YOUR_CLIENT_ID_HERE",
+    "clientSecret": "YOUR_CLIENT_SECRET_HERE",
+    "userPrincipalName": "admin@yourdomain.onmicrosoft.com",
+    "redirectUri": "http://localhost:8000/callback"
+  },
+  "graph": {
+    "teamMailRecipients": [
+      "user1@yourdomain.onmicrosoft.com",
+      "user2@yourdomain.onmicrosoft.com"
+    ],
+    "teamsTeamId": "YOUR_TEAMS_TEAM_ID",
+    "teamsChannelId": "YOUR_TEAMS_CHANNEL_ID",
+    "teamsChatId": "",
+    "teamsMeetingDurationMinutes": 30,
+    "copilotTaskSubjects": [
+      "Review Copilot prompts",
+      "Document Copilot feedback",
+      "Plan Copilot rollout",
+      "Verify E5 Dev API health",
+      "Sync Developer resources"
+    ],
+    "plannerPlanId": "YOUR_PLANNER_PLAN_ID",
+    "plannerBucketId": "YOUR_PLANNER_BUCKET_ID",
+    "plannerTaskTitles": [
+      "Review Copilot backlog",
+      "Track AI issues",
+      "Prepare Copilot highlights",
+      "Export plan to Excel",
+      "Automated Health Check"
+    ],
+    "plannerTaskDueInDays": 3,
+    "appRegistrationNames": [
+      "My_Copilot_Dev"
+    ],
+    "sharePointSiteId": "yourdomain.sharepoint.com,site-id,web-id",
+    "sharePointLibraryFolder": "CopilotAutomation",
+    "mailboxRuleName": "Copilot Auto Archive",
+    "mailboxRuleSubjectContains": "Copilot",
+    "mailboxRuleTargetFolderPath": "Inbox/Copilot Archive",
+    "userSnapshotReportPath": "M:\\API\\user_snapshot.json"
+  },
+  "rclone": {
+    "driveLetter": "M:",
+    "oneDriveRemote": "1Drive:",
+    "oneDriveApiPath": "1Drive:Documents/API/App1",
+    "sharePointRemote": "sharepoint:",
+    "sharePointApiPath": "sharepoint:Documents/API/App1",
+    "mountPath": "M:\\API_Output",
+    "localScreenshotsFolder": "C:\\Users\\USERNAME\\Pictures\\Screenshots"
+  },
+  "syncFolders": [],
+  "settings": {
+    "minActivities": 15,
+    "maxActivities": 25,
+    "logRetentionDays": 30
+  }
+}
