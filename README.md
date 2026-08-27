@@ -1,6 +1,6 @@
-# 🚀 HỆ THỐNG TỰ ĐỘNG GIA HẠN MICROSOFT 365 E5 DEVELOPER (E5 RENEW)
+# 🚀 HỆ THỐNG (TK E5 RENEW)
 
-> **Mục tiêu:** Tự động hóa toàn diện các hoạt động Microsoft Graph API, OneDrive, SharePoint, Teams, Planner, Mail, To-Do và File System nhằm duy trì trạng thái **Active** liên tục cho gói đăng ký Microsoft 365 Developer E5.
+> **Mục tiêu:** Tự động hóa toàn diện các hoạt động nhằm duy trì trạng thái **Active** liên tục cho gói đăng ký.
 
 ---
 
