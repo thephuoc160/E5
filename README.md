@@ -4,7 +4,7 @@
 
 ---
 
-## 📂 1. Cấu Trúc Thư Mục Dự Án (Đã tối ưu & siêu nhẹ)
+## 📂 1. Cấu Trúc Thư Mục Dự Án
 
 ```
 C:\Scripts\
