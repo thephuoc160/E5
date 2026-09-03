@@ -2,8 +2,8 @@ name: Microsoft 365 E5 Auto Renew Activity
 
 on:
   schedule:
-    # Chạy định kỳ 2 lần / mỗi 2 ngày (03:25 UTC và 15:25 UTC)
-    - cron: '25 3,15 */2 * *'
+    # Chạy định kỳ 1 lần / mỗi 5 ngày (8:30 UTC)
+    - cron: '30 8 */5 * *'
   workflow_dispatch: # Cho phép nhấn nút "Run workflow" thủ công bất kỳ lúc nào trên GitHub UI
   push:
     branches:
