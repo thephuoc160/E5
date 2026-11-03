@@ -52,7 +52,9 @@ Chạy trong PowerShell tại thư mục dự án:
 .\tasks\Check-TaskStatus.ps1
 ```
 
-Máy chủ Python dùng cổng `8765`. Phương án PowerShell dự phòng dùng cổng `5500`. Nếu HTML chưa có sau khi tải mã nguồn, máy chủ Python sẽ gọi trình tạo HTML trước khi phục vụ giao diện.
+Máy chủ Python dùng cổng `8765`. Phương án PowerShell dự phòng dùng cổng `5500`. Cả hai máy chủ tạo lại HTML từ mẫu giao diện UTF-8 mỗi lần khởi động.
+
+Dashboard dùng giao diện sáng, tiếng Việt và CSS cục bộ, không cần tải Tailwind từ Internet. Mã nguồn giao diện nằm trong `dashboard/dashboard.template.html`; mỗi lần mở máy chủ, `dashboard/Dashboard.html` được làm mới từ mẫu UTF-8. Sau khi cập nhật, đóng cửa sổ Dashboard cũ, mở lại `Dashboard.bat` và nhấn `Ctrl+F5` trong trình duyệt. Các script PowerShell có tiếng Việt được lưu UTF-8 có BOM để tương thích Windows PowerShell 5.1.
 
 ## Cấu hình và dữ liệu tại máy
 

@@ -1,0 +1,1339 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>E5 Workspace · Bảng điều khiển</title>
+    <style>
+      :root {
+        --paper: #f4f6f3;
+        --white: #fff;
+        --ink: #1c302a;
+        --muted: #5e7068;
+        --line: #dce4de;
+        --green: #176c4c;
+        --soft: #e8f2eb;
+        --amber: #86500d;
+        --red: #b33437;
+        --radius: 14px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 30px;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font:
+          15px/1.55 "Segoe UI",
+          Tahoma,
+          sans-serif;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+      button,
+      a {
+        touch-action: manipulation;
+      }
+      button {
+        cursor: pointer;
+        border: 1px solid var(--line);
+        background: white;
+        color: var(--ink);
+        border-radius: 8px;
+        padding: 10px 15px;
+        font-weight: 600;
+        display: inline-flex;
+        gap: 9px;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+      }
+      button:hover {
+        background: var(--soft);
+        border-color: #9db7a6;
+      }
+      button:disabled {
+        cursor: wait;
+        opacity: 0.55;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+        text-underline-offset: 5px;
+      }
+      :focus-visible {
+        outline: 3px solid #25835a;
+        outline-offset: 4px;
+      }
+      ::selection {
+        background: #cce7d4;
+        color: #143d29;
+      }
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #afbeb3;
+        border-radius: 8px;
+      }
+      .icon {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.7;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        flex: none;
+      }
+      .shell {
+        display: grid;
+        grid-template-columns: 228px minmax(0, 1fr);
+        min-height: 100vh;
+      }
+      .sidebar {
+        background: #edf1eb;
+        border-right: 1px solid var(--line);
+        padding: 32px 20px;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+      .brandmark {
+        display: grid;
+        grid-template-columns: repeat(2, 11px);
+        gap: 3px;
+        transform: rotate(-8deg);
+      }
+      .brandmark i {
+        height: 11px;
+        background: var(--green);
+        border-radius: 2px;
+      }
+      .brandmark i:nth-child(2) {
+        opacity: 0.5;
+      }
+      .brandmark i:nth-child(3) {
+        opacity: 0.75;
+      }
+      .subbrand {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 9px 0 38px 36px;
+      }
+      .nav {
+        display: grid;
+        gap: 7px;
+      }
+      .nav a {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 11px 13px;
+        border-radius: 8px;
+        color: #50665b;
+      }
+      .nav a.active {
+        background: var(--green);
+        color: white;
+        font-weight: 600;
+      }
+      .sidefoot {
+        margin-top: auto;
+        font-size: 12px;
+        color: var(--muted);
+        padding: 20px 12px 0;
+      }
+      .sidefoot strong {
+        display: block;
+        color: var(--ink);
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: currentColor;
+        display: inline-block;
+        margin-right: 7px;
+      }
+      .main {
+        padding: 0 42px 36px;
+        max-width: 1550px;
+        width: 100%;
+        margin: auto;
+      }
+      .topbar {
+        height: 88px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+        gap: 12px;
+      }
+      .breadcrumb {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .breadcrumb span {
+        margin: 0 12px;
+        color: #a0afa5;
+      }
+      .connection {
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 10px;
+        border-radius: 6px;
+        background: var(--soft);
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .badge.warn {
+        background: #fff1db;
+        color: var(--amber);
+      }
+      .badge.error {
+        background: #fceced;
+        color: var(--red);
+      }
+      .heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        margin: 34px 0 26px;
+      }
+      h1 {
+        font-size: 32px;
+        line-height: 1.25;
+        letter-spacing: -0.9px;
+        margin: 0 0 8px;
+        font-weight: 650;
+      }
+      p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .primary {
+        background: var(--green);
+        color: white;
+        border-color: var(--green);
+      }
+      .primary:hover {
+        background: #105538;
+        color: white;
+      }
+      .overview {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      .drive {
+        padding: 25px 27px;
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+      }
+      .drive-icon {
+        width: 50px;
+        height: 50px;
+        background: var(--soft);
+        color: var(--green);
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+      }
+      .drive-icon svg {
+        width: 27px;
+        height: 27px;
+      }
+      .drive h2 {
+        font-size: 20px;
+        margin: 0 0 4px;
+      }
+      .drive p {
+        font-size: 13px;
+      }
+      .drive .badge {
+        margin-top: 13px;
+      }
+      .identity {
+        padding: 25px 27px;
+        border-left: 1px solid var(--line);
+        background: #fbfcfa;
+        min-width: 0;
+      }
+      .label {
+        font-size: 12px;
+        color: var(--muted);
+        display: block;
+        margin-bottom: 5px;
+      }
+      .account {
+        font-weight: 600;
+        word-break: break-all;
+        font-size: 14px;
+      }
+      .tenant {
+        font-size: 12px;
+        word-break: break-all;
+        color: var(--muted);
+        margin-top: 9px;
+      }
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border-bottom: 1px solid var(--line);
+        padding: 25px 0;
+        margin-bottom: 30px;
+      }
+      .metric {
+        padding: 0 25px;
+        border-right: 1px solid var(--line);
+      }
+      .metric:first-child {
+        padding-left: 0;
+      }
+      .metric:last-child {
+        border: 0;
+      }
+      .metric strong {
+        font-size: 29px;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        display: block;
+        margin-top: 2px;
+      }
+      .metric small {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .metric .success {
+        color: var(--green);
+      }
+      .metric .warning {
+        color: var(--amber);
+      }
+      .metric .failure {
+        color: var(--red);
+      }
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+        gap: 28px;
+      }
+      .sectionhead {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+      h2 {
+        font-size: 18px;
+        line-height: 1.4;
+        margin: 0;
+        font-weight: 650;
+        letter-spacing: -0.3px;
+      }
+      .sectionhead small {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .actionlist {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: white;
+        overflow: hidden;
+      }
+      .actionrow {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--line);
+      }
+      .actionrow:last-child {
+        border: 0;
+      }
+      .actionrow > .icon {
+        color: var(--green);
+        margin-right: 2px;
+      }
+      .actiontext {
+        flex: 1;
+        min-width: 0;
+      }
+      .actiontext strong {
+        font-weight: 600;
+        display: block;
+        font-size: 14px;
+      }
+      .actiontext small {
+        font-size: 12px;
+        color: var(--muted);
+        display: block;
+        margin-top: 3px;
+      }
+      .actionrow button {
+        font-size: 12px;
+        padding: 7px 12px;
+        min-height: 38px;
+      }
+      .groupgap {
+        margin-top: 28px;
+      }
+      .schedule {
+        background: #e9eee5;
+        border-radius: var(--radius);
+        padding: 22px;
+      }
+      .schedule .empty {
+        margin: 19px 0;
+        font-size: 13px;
+      }
+      .schedule button {
+        width: 100%;
+        background: transparent;
+        border-color: #bccdbd;
+      }
+      .task {
+        padding: 13px 0;
+        border-bottom: 1px solid #cfdbcf;
+        font-size: 13px;
+      }
+      .task strong {
+        display: block;
+        overflow-wrap: anywhere;
+      }
+      .task small {
+        display: block;
+        color: var(--muted);
+        margin: 3px 0;
+      }
+      .task:last-child {
+        margin-bottom: 18px;
+      }
+      .notice {
+        margin-top: 22px;
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        gap: 10px;
+        padding: 0 4px;
+      }
+      .notice .icon {
+        color: var(--green);
+      }
+      .console {
+        margin-top: 28px;
+        border-radius: var(--radius);
+        background: #1c302a;
+        color: #e1ece4;
+        overflow: hidden;
+      }
+      .consoleheader {
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #395046;
+        gap: 10px;
+      }
+      .consoleheader h2 {
+        font-size: 15px;
+        color: white;
+      }
+      .consoleheader button {
+        min-height: 32px;
+        padding: 4px 9px;
+        font-size: 12px;
+        color: #d6e4da;
+        background: transparent;
+        border-color: #61756a;
+      }
+      .console pre {
+        margin: 0;
+        padding: 20px;
+        min-height: 145px;
+        max-height: 340px;
+        overflow: auto;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        font:
+          12px/1.8 Consolas,
+          monospace;
+        color: #e3eee7;
+      }
+      .console small {
+        color: #bed0c3;
+        font-size: 12px;
+      }
+      .logs {
+        margin-top: 32px;
+      }
+      .logtools {
+        display: flex;
+        gap: 8px;
+      }
+      .logtools select {
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        color: var(--muted);
+        padding: 7px;
+        font-size: 12px;
+        min-height: 38px;
+      }
+      .logentries {
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        max-height: 360px;
+        overflow: auto;
+      }
+      .logentry {
+        padding: 12px 18px;
+        border-bottom: 1px solid var(--line);
+        font:
+          12px/1.7 Consolas,
+          monospace;
+        overflow-wrap: anywhere;
+      }
+      .logentry span {
+        display: block;
+        font:
+          11px "Segoe UI",
+          sans-serif;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+      .emptybox {
+        padding: 28px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 30px;
+      }
+      .banner {
+        padding: 12px 16px;
+        background: #fff1db;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        color: #74440b;
+        font-size: 13px;
+      }
+      .banner[hidden] {
+        display: none;
+      }
+      .toast {
+        position: fixed;
+        bottom: 22px;
+        right: 22px;
+        max-width: min(420px, 90vw);
+        padding: 14px 20px;
+        background: var(--ink);
+        color: white;
+        border-radius: 10px;
+        box-shadow: 0 8px 30px #1c302a26;
+        z-index: 10;
+      }
+      .toast[hidden] {
+        display: none;
+      }
+      dialog {
+        border: 0;
+        border-radius: 16px;
+        padding: 28px;
+        max-width: min(460px, 90vw);
+        box-shadow: 0 20px 70px #0003;
+        color: var(--ink);
+      }
+      dialog::backdrop {
+        background: #102d2366;
+      }
+      dialog p {
+        margin: 12px 0 22px;
+        font-size: 14px;
+      }
+      .dialogbuttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+      .skip {
+        position: fixed;
+        left: 10px;
+        top: -80px;
+        background: white;
+        padding: 12px;
+        z-index: 20;
+      }
+      .skip:focus {
+        top: 10px;
+      }
+      @media (min-width: 1600px) {
+        .main {
+          padding-left: 60px;
+          padding-right: 60px;
+        }
+      }
+      @media (max-width: 1150px) {
+        .main {
+          padding: 0 26px 30px;
+        }
+        .sidebar {
+          padding: 28px 14px;
+        }
+        .shell {
+          grid-template-columns: 195px minmax(0, 1fr);
+        }
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+        .overview {
+          grid-template-columns: 1.2fr 1fr;
+        }
+        .heading {
+          gap: 12px;
+        }
+        h1 {
+          font-size: 28px;
+        }
+      }
+      @media (max-width: 700px) {
+        .shell {
+          display: block;
+        }
+        .sidebar {
+          height: auto;
+          position: relative;
+          padding: 18px 20px;
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+        .brand {
+          font-size: 18px;
+        }
+        .subbrand,
+        .sidefoot {
+          display: none;
+        }
+        .nav {
+          display: flex;
+          overflow: auto;
+          margin-top: 17px;
+          gap: 4px;
+        }
+        .nav a {
+          padding: 8px 10px;
+          font-size: 12px;
+          white-space: nowrap;
+        }
+        .nav .icon {
+          width: 16px;
+          height: 16px;
+        }
+        .main {
+          padding: 0 18px 24px;
+        }
+        .topbar {
+          height: 65px;
+        }
+        .breadcrumb {
+          display: none;
+        }
+        .connection {
+          justify-content: space-between;
+          width: 100%;
+        }
+        .heading {
+          align-items: flex-start;
+          flex-direction: column;
+          margin: 26px 0 20px;
+          gap: 18px;
+        }
+        h1 {
+          font-size: 28px;
+        }
+        .heading p {
+          font-size: 13px;
+        }
+        .heading > .primary {
+          width: 100%;
+        }
+        .overview {
+          grid-template-columns: 1fr;
+        }
+        .drive,
+        .identity {
+          padding: 20px;
+        }
+        .identity {
+          border-left: 0;
+          border-top: 1px solid var(--line);
+        }
+        .metrics {
+          gap: 0;
+          padding: 20px 0;
+        }
+        .metric {
+          padding: 0 12px;
+        }
+        .metric .label {
+          font-size: 11px;
+        }
+        .metric strong {
+          font-size: 25px;
+        }
+        .metric small {
+          font-size: 10px;
+        }
+        .actionrow {
+          padding: 16px 14px;
+          gap: 10px;
+        }
+        .actiontext small {
+          font-size: 11px;
+        }
+        .actionrow button {
+          padding: 6px 9px;
+        }
+        .footer {
+          flex-direction: column;
+        }
+        .logtools select {
+          max-width: 125px;
+        }
+        .sectionhead h2 {
+          font-size: 16px;
+        }
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .overview {
+          animation: arrive 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes arrive {
+          from {
+            filter: brightness(0.96);
+          }
+          to {
+            filter: brightness(1);
+          }
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      style="display: none"
+      aria-hidden="true"
+    >
+      <defs>
+        <symbol id="grid" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7" rx="1.5" />
+          <rect x="14" y="3" width="7" height="7" rx="1.5" />
+          <rect x="3" y="14" width="7" height="7" rx="1.5" />
+          <rect x="14" y="14" width="7" height="7" rx="1.5" />
+        </symbol>
+        <symbol id="drive" viewBox="0 0 24 24">
+          <path d="m5 4-3 12v4h20v-4L19 4Z" />
+          <path d="M2 16h20M16 12h2" />
+        </symbol>
+        <symbol id="play" viewBox="0 0 24 24">
+          <path d="m8 5 11 7-11 7Z" />
+        </symbol>
+        <symbol id="clock" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3 2" />
+        </symbol>
+        <symbol id="log" viewBox="0 0 24 24">
+          <rect x="5" y="3" width="14" height="18" rx="2" />
+          <path d="M9 8h6M9 12h6M9 16h4" />
+        </symbol>
+        <symbol id="cloud" viewBox="0 0 24 24">
+          <path d="M7 18a5 5 0 1 1 .3-10A6 6 0 0 1 19 10a4 4 0 0 1 0 8Z" />
+        </symbol>
+        <symbol id="sync" viewBox="0 0 24 24">
+          <path
+            d="M20 7h-5l3-3M4 17h5l-3 3M20 7a8 8 0 0 0-14-1M4 17a8 8 0 0 0 14 1"
+          />
+        </symbol>
+        <symbol id="shield" viewBox="0 0 24 24">
+          <path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6Z" />
+          <path d="m8 12 3 3 5-6" />
+        </symbol>
+        <symbol id="mail" viewBox="0 0 24 24">
+          <rect x="3" y="5" width="18" height="14" rx="2" />
+          <path d="m3 6 9 7 9-7" />
+        </symbol>
+      </defs>
+    </svg>
+    <a href="#main" class="skip">Đến nội dung chính</a>
+    <div class="shell">
+      <aside class="sidebar">
+        <a class="brand" href="#"
+          ><span class="brandmark" aria-hidden="true"
+            ><i></i><i></i><i></i><i></i></span
+          >E5 Workspace</a
+        >
+        <div class="subbrand">Microsoft 365 · Quản lý cục bộ</div>
+        <nav class="nav" aria-label="Điều hướng chính">
+          <a class="active" href="#main"
+            ><svg class="icon"><use href="#grid" /></svg>Tổng quan</a
+          ><a href="#actions"
+            ><svg class="icon"><use href="#play" /></svg>Tác vụ</a
+          ><a href="#schedule"
+            ><svg class="icon"><use href="#clock" /></svg>Lịch tự động</a
+          ><a href="#logs"
+            ><svg class="icon"><use href="#log" /></svg>Nhật ký</a
+          >
+        </nav>
+        <div class="sidefoot">
+          <strong
+            ><span class="dot" style="color: var(--green)"></span>Không gian làm
+            việc cục bộ</strong
+          >Thao tác trên máy tính của bạn.<br />Dữ liệu trạng thái cập nhật mỗi
+          30 giây.
+        </div>
+      </aside>
+      <main class="main" id="main">
+        <div class="topbar">
+          <div class="breadcrumb">
+            Không gian làm việc <span>/</span> Tổng quan
+          </div>
+          <div class="connection">
+            <span class="badge warn" id="serverState"
+              ><span class="dot"></span>Đang kết nối</span
+            ><time id="updated">Chưa cập nhật</time>
+          </div>
+        </div>
+        <header class="heading">
+          <div>
+            <h1>Bảng điều khiển</h1>
+            <p>Theo dõi hệ thống. Chủ động mọi tác vụ Microsoft 365.</p>
+          </div>
+          <button class="primary" data-action="run_all">
+            <svg class="icon"><use href="#play" /></svg>Chạy toàn bộ chu trình
+          </button>
+        </header>
+        <div class="banner" id="connectionError" role="status" hidden></div>
+        <section class="overview" aria-label="Thông tin hệ thống">
+          <div class="drive">
+            <div class="drive-icon">
+              <svg class="icon"><use href="#drive" /></svg>
+            </div>
+            <div>
+              <h2 id="driveTitle">Ổ đĩa OneDrive</h2>
+              <p id="driveRemote">Đang đọc cấu hình kết nối…</p>
+              <span class="badge warn" id="mountState">Chưa có dữ liệu</span>
+            </div>
+          </div>
+          <div class="identity">
+            <span class="label">Tài khoản đang cấu hình</span>
+            <div class="account" id="account">Đang tải…</div>
+            <div class="tenant" id="tenant">Tenant: —</div>
+          </div>
+        </section>
+        <section class="metrics" aria-label="Thống kê nhật ký">
+          <div class="metric">
+            <span class="label">Thành công</span
+            ><strong class="success" id="successCount">—</strong
+            ><small>Bản ghi hoàn thành</small>
+          </div>
+          <div class="metric">
+            <span class="label">Cảnh báo</span
+            ><strong class="warning" id="warnCount">—</strong
+            ><small>Bản ghi cần lưu ý</small>
+          </div>
+          <div class="metric">
+            <span class="label">Lỗi ghi nhận</span
+            ><strong class="failure" id="errorCount">—</strong
+            ><small>Trong nhật ký Graph</small>
+          </div>
+        </section>
+        <div class="workspace">
+          <div>
+            <section id="actions">
+              <div class="sectionhead">
+                <h2>Tác vụ thường dùng</h2>
+                <small>Microsoft 365</small>
+              </div>
+              <div class="actionlist" id="mainActions"></div>
+            </section>
+            <section class="groupgap">
+              <div class="sectionhead">
+                <h2>Kết nối &amp; đồng bộ</h2>
+                <small>Rclone · OneDrive</small>
+              </div>
+              <div class="actionlist" id="driveActions"></div>
+            </section>
+            <details class="groupgap">
+              <summary
+                style="cursor: pointer; font-weight: 600; padding: 10px 0"
+              >
+                Tiện ích khác
+              </summary>
+              <div class="actionlist" id="extraActions"></div>
+            </details>
+          </div>
+          <aside>
+            <section class="schedule" id="schedule">
+              <div class="sectionhead">
+                <h2>Lịch tự động</h2>
+                <svg class="icon"><use href="#clock" /></svg>
+              </div>
+              <p style="font-size: 12px">Tác vụ Windows Task Scheduler</p>
+              <div id="tasks">
+                <p class="empty">Đang tải danh sách lịch chạy…</p>
+              </div>
+              <button data-action="setup_tasks">Thiết lập lịch 48 giờ</button>
+            </section>
+            <div class="notice">
+              <svg class="icon"><use href="#shield" /></svg
+              ><span
+                >Kiểm tra cấu hình trước khi chạy. Các tác vụ có thể gửi thư
+                hoặc thay đổi dữ liệu Microsoft 365.</span
+              >
+            </div>
+            <section class="console" aria-label="Kết quả thực thi">
+              <div class="consoleheader">
+                <h2>Kết quả thực thi</h2>
+                <button id="clearOutput">Dọn màn hình</button>
+              </div>
+              <pre id="output" tabindex="0">
+Sẵn sàng nhận tác vụ.
+Chọn một thao tác để xem kết quả tại đây.</pre>
+              <div style="padding: 0 20px 17px">
+                <small id="runState" role="status" aria-live="polite"
+                  >Chưa có tác vụ đang chạy</small
+                >
+              </div>
+            </section>
+          </aside>
+        </div>
+        <section class="logs" id="logs">
+          <div class="sectionhead">
+            <h2>Nhật ký gần đây</h2>
+            <div class="logtools">
+              <select id="logFilter" aria-label="Lọc mức nhật ký">
+                <option value="ALL">Tất cả mức</option>
+                <option value="SUCCESS">Thành công</option>
+                <option value="WARN">Cảnh báo</option>
+                <option value="ERROR">Lỗi</option></select
+              ><button
+                id="refresh"
+                title="Cập nhật trạng thái"
+                aria-label="Cập nhật trạng thái"
+              >
+                <svg class="icon"><use href="#sync" /></svg>
+              </button>
+            </div>
+          </div>
+          <div class="logentries" id="logEntries">
+            <div class="emptybox">Đang tải nhật ký…</div>
+          </div>
+        </section>
+        <footer class="footer">
+          <span>E5 Workspace · Microsoft 365</span
+          ><span>Trạng thái thực tế từ máy tính của bạn</span>
+        </footer>
+      </main>
+    </div>
+    <dialog
+      id="confirm"
+      aria-labelledby="confirmTitle"
+      aria-describedby="confirmText"
+    >
+      <h2 id="confirmTitle">Xác nhận chạy tác vụ</h2>
+      <p id="confirmText"></p>
+      <div class="dialogbuttons">
+        <button id="cancel">Hủy</button
+        ><button class="primary" id="proceed">Xác nhận chạy</button>
+      </div>
+    </dialog>
+    <div class="toast" id="toast" role="status" hidden></div>
+    <script>
+      "use strict";
+      const actions = {
+        run_all: [
+          "Chạy toàn bộ chu trình",
+          "Kiểm tra mount, chạy Graph và SharePoint",
+          "play",
+          "Chu trình có thể gửi thư, tạo sự kiện và thay đổi dữ liệu Microsoft 365.",
+        ],
+        graph_activity: [
+          "Hoạt động Microsoft Graph",
+          "Mail, Teams, Calendar, Planner và To-Do",
+          "grid",
+          "Tác vụ có thể gửi thư, tạo sự kiện, tệp và công việc Microsoft 365.",
+        ],
+        sharepoint_sync: [
+          "Hoạt động SharePoint",
+          "Kiểm tra kết nối và thực hiện hoạt động tệp",
+          "cloud",
+          "Tác vụ sẽ thực hiện hoạt động tệp trên SharePoint.",
+        ],
+        python_app: [
+          "Chạy Python ứng dụng",
+          "Hoạt động Graph bằng tài khoản ứng dụng",
+          "play",
+          "Tác vụ có thể gửi thư, tạo tệp và tải ảnh lên SharePoint.",
+        ],
+        mount: [
+          "Kết nối ổ đĩa",
+          "Gắn remote OneDrive vào máy tính",
+          "drive",
+          "Tác vụ sẽ kết nối ổ đĩa rclone.",
+        ],
+        check_mount: [
+          "Kiểm tra kết nối",
+          "Kiểm tra và tự khôi phục mount khi cần",
+          "sync",
+          "Tác vụ có thể khởi động lại kết nối rclone.",
+        ],
+        unmount: [
+          "Ngắt kết nối ổ đĩa",
+          "Dừng tiến trình mount đang quản lý",
+          "drive",
+          "Hãy đóng các tệp đang dùng trên ổ đĩa trước khi ngắt kết nối.",
+        ],
+        onedrive_sync: [
+          "Đồng bộ OneDrive",
+          "Business sang Personal theo cấu hình",
+          "sync",
+          "Đồng bộ dùng chế độ mirror: tệp dư ở thư mục đích có thể bị xóa. Kiểm tra cấu hình nguồn và đích trước khi chạy.",
+        ],
+        reconnect_1drive: [
+          "Đăng nhập lại OneDrive",
+          "Mở cửa sổ đăng nhập rclone trên máy",
+          "cloud",
+          "Tác vụ mở cửa sổ tương tác để đăng nhập lại.",
+        ],
+        setup_tasks: [
+          "Thiết lập lịch 48 giờ",
+          "Đăng ký Windows Task Scheduler",
+          "clock",
+          "Tác vụ sẽ thay thế lịch E5 hiện có và đăng ký lịch tự động.",
+        ],
+        check_tasks: [
+          "Kiểm tra lịch chạy",
+          "Xem trạng thái Windows Task Scheduler",
+          "clock",
+          "",
+        ],
+        quick_renew: [
+          "Quick Renew",
+          "Tạo thư mục xác minh hoặc chạy Graph",
+          "cloud",
+          "Tác vụ sẽ tạo dữ liệu xác minh; có thể gọi hoạt động Graph khi ổ đĩa chưa sẵn sàng.",
+        ],
+        create_draft: [
+          "Tạo thư nháp",
+          "Tạo bản nháp Outlook qua Microsoft Graph",
+          "mail",
+          "Tác vụ sẽ tạo một thư nháp trong Outlook.",
+        ],
+      };
+      const $ = (id) => document.getElementById(id);
+      let busy = false,
+        connected = false,
+        pending = null,
+        logs = [],
+        refreshing = false;
+      const api = location.protocol.startsWith("http") ? location.origin : null;
+      function rows(target, keys) {
+        for (const key of keys) {
+          const [title, detail, icon] = actions[key];
+          const row = document.createElement("div");
+          row.className = "actionrow";
+          row.innerHTML =
+            '<svg class="icon" aria-hidden="true"><use href="#' +
+            icon +
+            '"/></svg><div class="actiontext"><strong>' +
+            title +
+            "</strong><small>" +
+            detail +
+            '</small></div><button aria-label="Chạy: ' +
+            title +
+            '" data-action="' +
+            key +
+            '">Chạy</button>';
+          $(target).append(row);
+        }
+      }
+      rows("mainActions", ["graph_activity", "sharepoint_sync", "python_app"]);
+      rows("driveActions", [
+        "mount",
+        "check_mount",
+        "unmount",
+        "onedrive_sync",
+      ]);
+      rows("extraActions", [
+        "reconnect_1drive",
+        "check_tasks",
+        "quick_renew",
+        "create_draft",
+      ]);
+      function notify(text) {
+        $("toast").textContent = text;
+        $("toast").hidden = false;
+        setTimeout(() => {
+          $("toast").hidden = true;
+        }, 4500);
+      }
+      function setButtons() {
+        document
+          .querySelectorAll("[data-action]")
+          .forEach((b) => (b.disabled = busy || !connected));
+      }
+      function renderLogs() {
+        const filter = $("logFilter").value;
+        const entries = logs.filter(
+          (l) =>
+            filter === "ALL" || String(l.text || l.Text || "").includes(filter),
+        );
+        $("logEntries").replaceChildren();
+        if (!entries.length) {
+          const e = document.createElement("div");
+          e.className = "emptybox";
+          e.textContent = logs.length
+            ? "Không có bản ghi phù hợp bộ lọc."
+            : "Chưa có nhật ký. Chạy tác vụ để ghi nhận hoạt động.";
+          $("logEntries").append(e);
+          return;
+        }
+        for (const log of entries.slice().reverse()) {
+          const row = document.createElement("div");
+          row.className = "logentry";
+          const file = document.createElement("span");
+          file.textContent = log.file || log.File || "Nhật ký";
+          const text = document.createElement("div");
+          text.textContent = log.text || log.Text || "";
+          row.append(file, text);
+          $("logEntries").append(row);
+        }
+      }
+      function renderTasks(tasks, error) {
+        $("tasks").replaceChildren();
+        if (error) {
+          const p = document.createElement("p");
+          p.className = "empty";
+          p.textContent = error;
+          $("tasks").append(p);
+          return;
+        }
+        if (!tasks.length) {
+          const p = document.createElement("p");
+          p.className = "empty";
+          p.textContent = "Chưa có lịch chạy E5 được đăng ký.";
+          $("tasks").append(p);
+          return;
+        }
+        for (const task of tasks) {
+          const row = document.createElement("div");
+          row.className = "task";
+          const name = document.createElement("strong");
+          name.textContent = task.Name;
+          const state = document.createElement("small");
+          state.textContent =
+            "Trạng thái: " +
+            ({ Ready: "Sẵn sàng", Running: "Đang chạy", Disabled: "Đã tắt" }[
+              task.State
+            ] || task.State);
+          const next = document.createElement("small");
+          next.textContent =
+            "Lần tiếp theo: " + (task.NextRun || "Chưa xác định");
+          row.append(name, state, next);
+          $("tasks").append(row);
+        }
+      }
+      async function refresh() {
+        if (refreshing) return;
+        refreshing = true;
+        $("refresh").disabled = true;
+        try {
+          if (!api) throw Error("Mở Dashboard.bat để kết nối máy chủ cục bộ.");
+          const response = await fetch(api + "/api/status", {
+            signal: AbortSignal.timeout(15000),
+          });
+          if (!response.ok)
+            throw Error("Máy chủ trả về lỗi " + response.status);
+          const d = await response.json();
+          connected = true;
+          $("serverState").className = "badge";
+          $("serverState").textContent = "Đã kết nối máy chủ";
+          $("connectionError").hidden = true;
+          $("updated").textContent = "Cập nhật: " + d.GeneratedAt;
+          $("driveTitle").textContent = "Ổ đĩa " + d.DriveLetter;
+          $("driveRemote").textContent = "Remote: " + d.MountRemote;
+          $("mountState").textContent = d.IsMounted
+            ? "Đã kết nối"
+            : "Chưa kết nối";
+          $("mountState").className = d.IsMounted ? "badge" : "badge warn";
+          $("account").textContent = d.UserUPN;
+          $("tenant").textContent = "Tenant: " + d.TenantId;
+          for (const [id, key] of [
+            ["successCount", "SuccessCount"],
+            ["warnCount", "WarnCount"],
+            ["errorCount", "ErrorCount"],
+          ])
+            $(id).textContent = d[key] ?? 0;
+          renderTasks(
+            d.Tasks ? (Array.isArray(d.Tasks) ? d.Tasks : [d.Tasks]) : [],
+            d.TasksError,
+          );
+          logs = d.RecentLogs
+            ? Array.isArray(d.RecentLogs)
+              ? d.RecentLogs
+              : [d.RecentLogs]
+            : [];
+          renderLogs();
+        } catch (e) {
+          connected = false;
+          $("serverState").className = "badge error";
+          $("serverState").textContent = "Mất kết nối";
+          $("connectionError").hidden = false;
+          $("connectionError").textContent =
+            "Không thể cập nhật trạng thái. " +
+            (api ? "Kiểm tra Dashboard.bat rồi nhấn nút cập nhật." : e.message);
+          $("tasks").textContent = "Chưa thể đọc lịch chạy.";
+          $("logEntries").textContent =
+            "Chưa thể đọc nhật ký. Khôi phục kết nối để cập nhật.";
+        } finally {
+          refreshing = false;
+          $("refresh").disabled = false;
+          setButtons();
+        }
+      }
+      async function run(key) {
+        if (busy || !connected) return;
+        busy = true;
+        setButtons();
+        const label = actions[key][0];
+        $("runState").textContent = "Đang chạy: " + label;
+        $("output").textContent =
+          "Đang thực thi " +
+          label +
+          "…\nKết quả sẽ hiển thị khi tác vụ hoàn tất.";
+        try {
+          const r = await fetch(api + "/api/run", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: key }),
+            signal: AbortSignal.timeout(310000),
+          });
+          if (!r.ok) throw Error("Máy chủ trả về lỗi " + r.status);
+          const result = await r.json();
+          $("output").textContent =
+            result.Output || "Tác vụ không trả về nội dung.";
+          $("runState").textContent =
+            (result.Success ? "Hoàn tất" : "Có lỗi") + " · " + label;
+          notify(
+            result.Success
+              ? "Tác vụ đã hoàn tất."
+              : "Tác vụ có lỗi. Xem kết quả thực thi.",
+          );
+        } catch (e) {
+          $("output").textContent =
+            "Không nhận được kết quả: " +
+            e.message +
+            "\nTác vụ trên máy có thể vẫn đang chạy. Kiểm tra nhật ký trước khi chạy lại.";
+          $("runState").textContent = "Chưa xác định kết quả · " + label;
+        } finally {
+          busy = false;
+          setButtons();
+          refresh();
+        }
+      }
+      document.addEventListener("click", (e) => {
+        const button = e.target.closest("[data-action]");
+        if (!button) return;
+        const key = button.dataset.action;
+        if (busy || !connected) return;
+        if (actions[key][3]) {
+          pending = key;
+          $("confirmTitle").textContent = actions[key][0];
+          $("confirmText").textContent = actions[key][3];
+          $("confirm").showModal();
+          $("cancel").focus();
+        } else run(key);
+      });
+      $("cancel").onclick = () => {
+        $("confirm").close();
+        pending = null;
+      };
+      $("proceed").onclick = () => {
+        const key = pending;
+        $("confirm").close();
+        pending = null;
+        if (key) run(key);
+      };
+      $("refresh").onclick = refresh;
+      $("logFilter").onchange = renderLogs;
+      $("clearOutput").onclick = () => {
+        if (busy) {
+          notify("Đợi tác vụ hoàn tất trước khi dọn kết quả.");
+          return;
+        }
+        $("output").textContent = "Màn hình kết quả đã được dọn sạch.";
+      };
+      document.querySelectorAll(".nav a").forEach((a) =>
+        a.addEventListener("click", () => {
+          document
+            .querySelectorAll(".nav a")
+            .forEach((x) => x.classList.remove("active"));
+          a.classList.add("active");
+        }),
+      );
+      setButtons();
+      refresh();
+      setInterval(() => {
+        if (!document.hidden && !busy) refresh();
+      }, 30000);
+    </script>
+  </body>
+</html>

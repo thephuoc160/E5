@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     E5 Helper Utilities (Quick Renew, Folder Upload, Draft Mail, File Tools)
 .DESCRIPTION
