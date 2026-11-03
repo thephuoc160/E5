@@ -1,5 +1,7 @@
 # Microsoft 365 E5 — bộ script quản lý
 
+> **Mục tiêu:** Tự động hóa các hoạt động Microsoft 365 E5 theo cấu hình, đồng thời ưu tiên an toàn dữ liệu và khả năng kiểm chứng.
+
 Mã nguồn trong `C:\Scripts`, liên kết với repository `thephuoc160/E5`.
 
 ## Bắt đầu sử dụng
