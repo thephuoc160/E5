@@ -7,4 +7,4 @@ param(
     [switch]$OpenDraftInBrowser
 )
 $targetScript = Join-Path $PSScriptRoot "core\E5-RenewHelper.ps1"
-& $targetScript -Action CreateDraft -UserPrincipalName $UserPrincipalName
+& $targetScript -Action CreateDraft -UserPrincipalName $UserPrincipalName -OpenDraftInBrowser:$OpenDraftInBrowser

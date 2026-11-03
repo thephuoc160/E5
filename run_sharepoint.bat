@@ -1,5 +1,4 @@
 @echo off
-cd /d "%~dp0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "core\E5-SharePointSync.ps1"
-echo.
-pause
+rem Compatibility entry point. Edit launchers\Run-SharePoint.bat instead.
+call "%~dp0launchers\Run-SharePoint.bat" %*
+exit /b %errorlevel%

@@ -18,7 +18,8 @@ param(
     [string]$Action = "QuickRenew",
     [string]$LocalFolder = "",
     [string]$TargetFolder = "",
-    [string]$UserPrincipalName = ""
+    [string]$UserPrincipalName = "",
+    [switch]$OpenDraftInBrowser
 )
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
@@ -97,7 +98,7 @@ function Invoke-UploadFolderToSharePoint {
     
     $targetName = "DevUpload_" + (Get-Date -Format "yyyyMMdd_HHmmss")
     $body = @{ name = $targetName; folder = @{}; "@microsoft.graph.conflictBehavior" = "rename" } | ConvertTo-Json
-    $folder = Invoke-MgGraphRequest -Method POST -Uri "https://graph.microsoft.com/v1.0/drives/$driveId/root/children" -Body $body -ContentType "application/json"
+    Invoke-MgGraphRequest -Method POST -Uri "https://graph.microsoft.com/v1.0/drives/$driveId/root/children" -Body $body -ContentType "application/json" | Out-Null
     
     $files = Get-ChildItem -Path $SourcePath -File
     Write-Host "Đang upload $($files.Count) file lên SharePoint folder: $targetName..." -ForegroundColor Cyan
@@ -105,13 +106,21 @@ function Invoke-UploadFolderToSharePoint {
     foreach ($f in $files) {
         $bytes = [IO.File]::ReadAllBytes($f.FullName)
         $ct = Get-ContentType -Path $f.FullName
-        $uploadUrl = "https://graph.microsoft.com/v1.0/drives/$driveId/root:/$targetName/$($f.Name):/content"
+        $encodedFileName = [Uri]::EscapeDataString($f.Name)
+        $uploadUrl = "https://graph.microsoft.com/v1.0/drives/$driveId/root:/$targetName/$encodedFileName`:/content"
         Invoke-MgGraphRequest -Method PUT -Uri $uploadUrl -Body $bytes -ContentType $ct | Out-Null
         Write-Host "  ✅ Uploaded: $($f.Name)" -ForegroundColor Green
     }
 }
 
 function Invoke-CreateDraftMessage {
+    param(
+        [string]$UPN = "",
+        [string]$Subject = "E5 Renew - thư nháp kiểm tra Microsoft Graph",
+        [string[]]$Recipients = @(),
+        [switch]$OpenInBrowser
+    )
+
     if (-not $UPN -and (Test-Path $ConfigPath)) {
         try {
             $cfg = Get-Content $ConfigPath -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -176,7 +185,9 @@ function Invoke-DownloadCloudPlaceholders {
 switch ($Action) {
     "QuickRenew" { Invoke-QuickRenew }
     "UploadFolder" { Invoke-UploadFolderToSharePoint -SourcePath $LocalFolder }
-    "CreateDraft" { Invoke-CreateDraftMessage -UPN $UserPrincipalName }
+    "CreateDraft" {
+        Invoke-CreateDraftMessage -UPN $UserPrincipalName -OpenInBrowser:$OpenDraftInBrowser
+    }
     "DownloadPlaceholders" { Invoke-DownloadCloudPlaceholders -Path $LocalFolder }
     "CheckProperties" { Write-Host "Chức năng kiểm tra thuộc tính file đã sẵn sàng." -ForegroundColor Green }
 }

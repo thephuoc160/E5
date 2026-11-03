@@ -11,6 +11,9 @@ on:
     paths:
       - '.github/scripts/**'
 
+permissions:
+  contents: read
+
 jobs:
   renew-activity:
     name: Execute Microsoft Graph Cloud Activities

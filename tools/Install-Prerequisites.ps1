@@ -17,9 +17,7 @@ $graphModules = @(
     "Microsoft.Graph.Calendar",
     "Microsoft.Graph.Teams",
     "Microsoft.Graph.Planner",
-    "Microsoft.Graph.Sites",
-    "Microsoft.Graph.Applications",
-    "Microsoft.Graph.Identity.DirectoryManagement"
+    "Microsoft.Graph.Sites"
 )
 
 foreach ($mod in $graphModules) {
@@ -42,10 +40,19 @@ Write-Host "[2/3] Kiểm tra Python & thư viện Python..." -ForegroundColor Ye
 $pythonExe = Get-Command "python" -ErrorAction SilentlyContinue
 if ($pythonExe) {
     Write-Host "  ✅ Tìm thấy Python: $($pythonExe.Source)" -ForegroundColor Green
-    $reqFile = Join-Path (Split-Path -Parent $PSScriptRoot) "python\requirements.txt"
+    $pythonDir = Join-Path (Split-Path -Parent $PSScriptRoot) "python"
+    $lockFile = Join-Path $pythonDir "requirements.lock"
+    $reqFile = if (Test-Path $lockFile) {
+        $lockFile
+    } else {
+        Join-Path $pythonDir "requirements.txt"
+    }
     if (Test-Path $reqFile) {
-        Write-Host "  ⏳ Đang cài đặt requirements qua pip..." -ForegroundColor Cyan
-        pip install -r $reqFile
+        Write-Host "  ⏳ Đang cài đặt requirements từ $([IO.Path]::GetFileName($reqFile))..." -ForegroundColor Cyan
+        & $pythonExe.Source -m pip install -r $reqFile
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "  ❌ Cài đặt Python requirements thất bại." -ForegroundColor Red
+        }
     }
 } else {
     Write-Host "  ⚠️ Không tìm thấy Python trong PATH. Nếu muốn dùng các script Python, vui lòng cài đặt Python." -ForegroundColor Yellow

@@ -6,7 +6,7 @@
 
 ## 🚀 1. Các Hoạt Động Được Thực Thi Trên GitHub Actions
 
-Workflow [`.github/workflows/e5-renew.yml`](file:///c:/Scripts/.github/workflows/e5-renew.yml) sẽ tự động chạy định kỳ (**mỗi 48 giờ** tại các khung giờ `03:25 UTC` và `15:25 UTC`):
+Workflow [`.github/workflows/e5-renew.yml`](../.github/workflows/e5-renew.yml) sử dụng lịch cron trong file workflow (các khung giờ `03:25 UTC` và `15:25 UTC` vào những ngày được chọn):
 
 1. 🔑 **Xác thực OAuth 2.0 Client Credentials:** Đăng nhập an toàn qua Microsoft Entra ID.
 2. 📦 **Microsoft Graph JSON Batching (`$batch`):** Gom nhiều sub-requests truy vấn User, Messages, Drive, Organization trong 1 lần gọi HTTP.

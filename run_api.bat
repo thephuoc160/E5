@@ -1,5 +1,4 @@
 @echo off
-cd /d "%~dp0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "Run-All.ps1"
-echo.
-pause
+rem Compatibility entry point. Edit launchers\Run-Api.bat instead.
+call "%~dp0launchers\Run-Api.bat" %*
+exit /b %errorlevel%

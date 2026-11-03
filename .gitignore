@@ -11,6 +11,7 @@ tools/rclone.exe
 
 # Local generated dashboard and runtime outputs
 Dashboard.html
+dashboard/Dashboard.html
 logs/
 *.log
 sync_log.txt
@@ -27,3 +28,6 @@ __pycache__/
 Thumbs.db
 Desktop.ini
 scratch_drive_sim/
+scratch_sp_test/
+scratch/
+shortcuts/

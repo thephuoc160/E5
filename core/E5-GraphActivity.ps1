@@ -2,8 +2,8 @@
 .SYNOPSIS
     E5 Microsoft Graph & OneDrive Activity Generator
 .DESCRIPTION
-    Tạo các hoạt động phong phú (Mail, Teams, Calendar, Planner, To-Do, SharePoint,
-    App Registration, Mailbox Rules, File Operations) qua Microsoft Graph SDK và
+    Tạo các hoạt động phong phú (Mail, Teams, Calendar, Planner, To-Do, SharePoint
+    và File Operations) qua Microsoft Graph SDK và
     ổ đĩa M: nhằm duy trì hoạt động tài khoản Microsoft 365 Developer E5.
 .PARAMETER BasePath
     Đường dẫn thư mục làm việc trên ổ đĩa M: hoặc local (Mặc định: M:\API_Output)
@@ -53,6 +53,18 @@ if (-not $TeamMailRecipients -or $TeamMailRecipients.Count -eq 0) {
     else { $TeamMailRecipients = @("user1@yourdomain.onmicrosoft.com", "user2@yourdomain.onmicrosoft.com") }
 }
 
+if ($config -and $config.settings) {
+    if (-not $PSBoundParameters.ContainsKey("MinActivities") -and $config.settings.minActivities) {
+        $MinActivities = [int]$config.settings.minActivities
+    }
+    if (-not $PSBoundParameters.ContainsKey("MaxActivities") -and $config.settings.maxActivities) {
+        $MaxActivities = [int]$config.settings.maxActivities
+    }
+}
+if ($MinActivities -lt 1 -or $MaxActivities -lt $MinActivities) {
+    throw "Khoảng hoạt động không hợp lệ: MinActivities=$MinActivities, MaxActivities=$MaxActivities"
+}
+
 $TeamsTeamId = if ($config.graph.teamsTeamId) { $config.graph.teamsTeamId } else { "" }
 $TeamsChannelId = if ($config.graph.teamsChannelId) { $config.graph.teamsChannelId } else { "" }
 $TeamsChatId = if ($config.graph.teamsChatId) { $config.graph.teamsChatId } else { "" }
@@ -60,20 +72,12 @@ $PlannerPlanId = if ($config.graph.plannerPlanId) { $config.graph.plannerPlanId 
 $PlannerBucketId = if ($config.graph.plannerBucketId) { $config.graph.plannerBucketId } else { "" }
 $SharePointSiteId = if ($config.graph.sharePointSiteId) { $config.graph.sharePointSiteId } else { "" }
 $SharePointLibraryFolder = if ($config.graph.sharePointLibraryFolder) { $config.graph.sharePointLibraryFolder } else { "CopilotAutomation" }
-$MailboxRuleName = if ($config.graph.mailboxRuleName) { $config.graph.mailboxRuleName } else { "Auto Archive Rule" }
-$MailboxRuleSubjectContains = if ($config.graph.mailboxRuleSubjectContains) { $config.graph.mailboxRuleSubjectContains } else { "Review" }
-$MailboxRuleTargetFolderPath = if ($config.graph.mailboxRuleTargetFolderPath) { $config.graph.mailboxRuleTargetFolderPath } else { "Inbox/Archive" }
-$UserSnapshotReportPath = if ($config.graph.userSnapshotReportPath) { $config.graph.userSnapshotReportPath } else { "M:\API\user_snapshot.json" }
-
 $CopilotTaskSubjects = if ($config.graph.copilotTaskSubjects) { @($config.graph.copilotTaskSubjects) } else { @("Review Dev prompts", "Document feedback", "Plan rollout") }
 $PlannerTaskTitles = if ($config.graph.plannerTaskTitles) { @($config.graph.plannerTaskTitles) } else { @("Review backlog", "Track AI issues", "Prepare highlights", "Export plan to Excel") }
-$AppRegistrationNames = if ($config.graph.appRegistrationNames) { @($config.graph.appRegistrationNames) } else { @("My_Dev_App") }
-$AppRegistrationExistingAppIds = if ($config.graph.appRegistrationExistingAppIds) { @($config.graph.appRegistrationExistingAppIds) } else { @() }
-$AppRegistrationExistingSecretIds = if ($config.graph.appRegistrationExistingSecretIds) { @($config.graph.appRegistrationExistingSecretIds) } else { @() }
 
 # Fallback BasePath nếu M:\ chưa mount
 if (-not (Test-Path "M:\") -and $BasePath.StartsWith("M:", [System.StringComparison]::OrdinalIgnoreCase)) {
-    $localFallback = Join-Path $RootDir "scratch_drive_sim"
+    $localFallback = Join-Path $RootDir "scratch\drive_sim"
     if (-not (Test-Path $localFallback)) { New-Item -ItemType Directory -Path $localFallback -Force | Out-Null }
     Write-Warning "Ổ đĩa M: chưa sẵn sàng. Sử dụng thư mục tạm $localFallback cho hoạt động file."
     $BasePath = $localFallback
@@ -122,12 +126,25 @@ $(1..10 | ForEach-Object { "Line $_ - $(Get-Random)" })
     $content | Out-File -FilePath $Path -Encoding UTF8
 }
 
+function Get-ManagedActivityFile {
+    return @(Get-ChildItem -Path $BasePath -File -ErrorAction SilentlyContinue | Where-Object {
+        $_.Name -match '^(test_|copy_|renamed_).*\.txt$' -or
+        $_.Name -match '^data_.*\.json$'
+    })
+}
+
+function Get-ManagedActivityFolder {
+    return @(Get-ChildItem -Path $BasePath -Directory -ErrorAction SilentlyContinue | Where-Object {
+        $_.Name -match '^folder_'
+    })
+}
+
 function Invoke-FileSystemActivity {
     if (-not (Test-Path $BasePath)) {
         New-Item -ItemType Directory -Path $BasePath -Force | Out-Null
     }
     
-    $activityCount = Get-Random -Minimum $MinActivities -Maximum $MaxActivities
+    $activityCount = Get-Random -Minimum $MinActivities -Maximum ($MaxActivities + 1)
     Write-Log "Bắt đầu $activityCount hoạt động file system trên $BasePath" "INFO"
 
     for ($i = 1; $i -le $activityCount; $i++) {
@@ -150,7 +167,7 @@ function Invoke-FileSystemActivity {
                 Write-Log ("Liệt kê {0} items trong API folder" -f $items.Count) "INFO"
             }
             4 {
-                $files = Get-ChildItem -Path $BasePath -Filter "*.txt" -ErrorAction SilentlyContinue
+                $files = Get-ManagedActivityFile | Where-Object Extension -eq ".txt"
                 if ($files.Count -gt 0) {
                     $randomFile = $files | Get-Random
                     Get-Content -Path $randomFile.FullName -ErrorAction SilentlyContinue | Out-Null
@@ -158,7 +175,7 @@ function Invoke-FileSystemActivity {
                 }
             }
             5 {
-                $files = Get-ChildItem -Path $BasePath -Filter "*.txt" -ErrorAction SilentlyContinue
+                $files = Get-ManagedActivityFile | Where-Object Extension -eq ".txt"
                 if ($files.Count -gt 0) {
                     $source = $files | Get-Random
                     $copyName = "copy_{0}_{1}.txt" -f (Get-Date -Format "HHmmss"), $source.BaseName
@@ -176,7 +193,7 @@ function Invoke-FileSystemActivity {
                 }
             }
             7 {
-                $files = Get-ChildItem -Path $BasePath -Filter "*.txt" -ErrorAction SilentlyContinue
+                $files = Get-ManagedActivityFile | Where-Object Extension -eq ".txt"
                 if ($files.Count -gt 0) {
                     $file = $files | Get-Random
                     Add-Content -Path $file.FullName -Value ("`nUpdated: {0} - Random: {1}" -f (Get-Date), (Get-Random)) -ErrorAction SilentlyContinue
@@ -205,8 +222,8 @@ function Invoke-FileSystemActivity {
                 Write-Log ("Tổng kích thước: {0} KB ({1} files)" -f ([math]::Round($totalSize / 1KB, 2)), $files.Count) "INFO"
             }
             10 {
-                $files = Get-ChildItem -Path $BasePath -Filter "*.txt" -ErrorAction SilentlyContinue
-                $folders = Get-ChildItem -Path $BasePath -Directory -ErrorAction SilentlyContinue
+                $files = Get-ManagedActivityFile | Where-Object Extension -eq ".txt"
+                $folders = Get-ManagedActivityFolder
                 if ($files.Count -gt 0 -and $folders.Count -gt 0) {
                     $file = $files | Get-Random
                     $folder = $folders | Get-Random
@@ -225,7 +242,7 @@ function Invoke-FileSystemActivity {
                 }
             }
             12 {
-                $folders = Get-ChildItem -Path $BasePath -Directory -ErrorAction SilentlyContinue
+                $folders = Get-ManagedActivityFolder
                 if ($folders.Count -gt 0) {
                     $folder = $folders | Get-Random
                     $archiveName = "{0}_archive" -f $folder.Name
@@ -242,7 +259,7 @@ function Invoke-FileSystemActivity {
 
 function Invoke-CleanupOldFiles {
     Write-Log "Dọn dẹp các file giả lập cũ..." "INFO"
-    $oldFiles = Get-ChildItem -Path $BasePath -Filter "test_*" -ErrorAction SilentlyContinue | Where-Object {
+    $oldFiles = Get-ManagedActivityFile | Where-Object {
         $_.CreationTime -lt (Get-Date).AddHours(-24)
     }
 
@@ -251,7 +268,7 @@ function Invoke-CleanupOldFiles {
         Write-Log ("Cleanup: Xóa {0}" -f $file.Name) "INFO"
     }
 
-    $allFiles = Get-ChildItem -Path $BasePath -File -ErrorAction SilentlyContinue | Sort-Object CreationTime -Descending
+    $allFiles = Get-ManagedActivityFile | Sort-Object CreationTime -Descending
     if ($allFiles.Count -gt 50) {
         $filesToDelete = $allFiles | Select-Object -Skip 50
         foreach ($file in $filesToDelete) {
@@ -272,9 +289,7 @@ function Ensure-GraphConnection {
         "Microsoft.Graph.Calendar",
         "Microsoft.Graph.Teams",
         "Microsoft.Graph.Planner",
-        "Microsoft.Graph.Sites",
-        "Microsoft.Graph.Applications",
-        "Microsoft.Graph.Identity.DirectoryManagement"
+        "Microsoft.Graph.Sites"
     )
 
     foreach ($mod in $requiredModules) {
@@ -297,7 +312,15 @@ function Ensure-GraphConnection {
                 $missingScopes += $scope
             }
         }
-        if ($missingScopes.Count -eq 0) {
+        $accountMatches = (
+            -not $Username -or
+            [string]::Equals(
+                [string]$context.Account,
+                $Username,
+                [System.StringComparison]::OrdinalIgnoreCase
+            )
+        )
+        if ($missingScopes.Count -eq 0 -and $accountMatches) {
             $needsConnect = $false
         }
     }
@@ -305,6 +328,18 @@ function Ensure-GraphConnection {
     if ($needsConnect) {
         Write-Log "Kết nối tới Microsoft Graph..." "INFO"
         Connect-MgGraph -Scopes $Scopes -ContextScope Process -ErrorAction Stop | Out-Null
+        $context = Get-MgContext -ErrorAction Stop
+        if (
+            $Username -and
+            $context.Account -and
+            -not [string]::Equals(
+                [string]$context.Account,
+                $Username,
+                [System.StringComparison]::OrdinalIgnoreCase
+            )
+        ) {
+            throw "Tài khoản Graph '$($context.Account)' không khớp tài khoản cấu hình '$Username'."
+        }
         Write-Log "Đã kết nối thành công tới Microsoft Graph!" "SUCCESS"
     } else {
         Write-Log "Tái sử dụng phiên Microsoft Graph hiện có: $($context.Account)" "INFO"
@@ -372,8 +407,8 @@ function Invoke-TeamsMeeting {
     }
 
     try {
-        $event = New-MgUserEvent -UserId $UserId -BodyParameter $eventParams -ErrorAction Stop
-        Write-Log ("Đã tạo Teams Meeting: {0}" -f $event.Subject) "SUCCESS"
+        $createdEvent = New-MgUserEvent -UserId $UserId -BodyParameter $eventParams -ErrorAction Stop
+        Write-Log ("Đã tạo Teams Meeting: {0}" -f $createdEvent.Subject) "SUCCESS"
     } catch {
         Write-Log ("Tạo cuộc họp thất bại: {0}" -f $_.Exception.Message) "WARN"
     }
@@ -526,8 +561,7 @@ try {
         $scopes = @(
             "Mail.Send", "Calendars.ReadWrite", "Tasks.ReadWrite",
             "Group.ReadWrite.All", "Chat.ReadWrite", "Sites.ReadWrite.All",
-            "Application.ReadWrite.All", "Mail.ReadWrite", "MailboxSettings.ReadWrite",
-            "User.Read.All"
+            "ChannelMessage.Send"
         )
         
         Ensure-GraphConnection -Scopes $scopes -Username $UserPrincipalName

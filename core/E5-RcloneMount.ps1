@@ -36,10 +36,22 @@ if ([string]::IsNullOrWhiteSpace($Remote) -and (Test-Path $ConfigPath)) {
     try {
         $cfg = Get-Content $ConfigPath -Raw -Encoding UTF8 | ConvertFrom-Json
         if ($cfg.rclone.oneDriveRemote) { $Remote = $cfg.rclone.oneDriveRemote }
-        if ($cfg.rclone.mountDrive) { $DriveLetter = $cfg.rclone.mountDrive }
+        if ($cfg.rclone.driveLetter) {
+            $DriveLetter = $cfg.rclone.driveLetter
+        } elseif ($cfg.rclone.mountDrive) {
+            # Backward compatibility with older local configuration files.
+            $DriveLetter = $cfg.rclone.mountDrive
+        }
     } catch {}
 }
 if ([string]::IsNullOrWhiteSpace($Remote)) { $Remote = "1Drive:" }
+
+if ($DriveLetter -notmatch '^[A-Za-z]:$') {
+    throw "DriveLetter không hợp lệ: '$DriveLetter'. Giá trị phải có dạng M:."
+}
+if ($Remote -notmatch '^[A-Za-z0-9._-]+:$') {
+    throw "Remote rclone không hợp lệ: '$Remote'. Chỉ chấp nhận tên remote, ví dụ 1Drive:."
+}
 
 function Write-MountLog {
     param([string]$Message, [string]$Level = "INFO")
@@ -84,22 +96,24 @@ function Test-MountStatus {
     return (Test-Path $driveRoot -ErrorAction SilentlyContinue)
 }
 
+function Get-ManagedRcloneMountProcess {
+    $processes = Get-CimInstance Win32_Process -Filter "Name = 'rclone.exe'" -ErrorAction SilentlyContinue
+    return @($processes | Where-Object {
+        $_.CommandLine -and
+        $_.CommandLine -match '(?i)\bmount\b' -and
+        $_.CommandLine.IndexOf($DriveLetter, [StringComparison]::OrdinalIgnoreCase) -ge 0
+    })
+}
+
 function Stop-RcloneMount {
     Write-MountLog "Đang ngắt kết nối ổ đĩa $DriveLetter..." "INFO"
-    $rcloneBin = Get-RcloneBinary
-    
-    # 1. Thử qua remote control rclone rc
-    if ($rcloneBin) {
-        try {
-            & $rcloneBin rc core/quit 2>$null | Out-Null
-            Start-Sleep -Seconds 2
-        } catch {}
-    }
-    
-    # 2. Dừng process nếu còn tồn tại
-    $procs = Get-Process -Name "rclone" -ErrorAction SilentlyContinue
+
+    # Chỉ dừng tiến trình mount đúng ký tự ổ đĩa do dự án quản lý.
+    $procs = Get-ManagedRcloneMountProcess
     if ($procs) {
-        $procs | Stop-Process -Force -ErrorAction SilentlyContinue
+        $procs | ForEach-Object {
+            Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
+        }
         Start-Sleep -Seconds 2
     }
     
@@ -139,11 +153,16 @@ function Start-RcloneMount {
     
     Write-MountLog "Khởi động rclone mount: $Remote -> $DriveLetter (Binary: $rcloneBin)" "INFO"
     
-    # Dọn dẹp tiến trình cũ nếu có
-    Get-Process -Name "rclone" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 1
+    # Dọn tiến trình cũ của đúng mount này, không ảnh hưởng các tiến trình rclone khác.
+    $staleProcesses = Get-ManagedRcloneMountProcess
+    if ($staleProcesses) {
+        $staleProcesses | ForEach-Object {
+            Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
+        }
+        Start-Sleep -Seconds 1
+    }
     
-    $argList = "mount $Remote $DriveLetter --vfs-cache-mode writes --rc"
+    $argList = "mount $Remote $DriveLetter --vfs-cache-mode writes"
     
     Start-Process -FilePath $rcloneBin -ArgumentList $argList -WindowStyle Hidden
     
