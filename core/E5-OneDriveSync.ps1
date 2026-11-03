@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     E5 OneDrive Sync Manager (OneDrive Business <-> OneDrive Personal)
 .DESCRIPTION

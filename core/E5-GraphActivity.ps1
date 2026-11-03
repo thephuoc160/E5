@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     E5 Microsoft Graph & OneDrive Activity Generator
 .DESCRIPTION

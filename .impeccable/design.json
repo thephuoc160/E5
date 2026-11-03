@@ -1,0 +1,337 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-03T03:20:01.066Z",
+  "title": "Design System: E5 Workspace",
+  "extensions": {
+    "colorMeta": {
+      "green": {
+        "role": "primary",
+        "displayName": "Xanh vận hành",
+        "tonalRamp": [
+          "oklch(15% 0.035 155)",
+          "oklch(27% 0.065 155)",
+          "oklch(39% 0.090 155)",
+          "oklch(51% 0.100 155)",
+          "oklch(63% 0.100 155)",
+          "oklch(75% 0.080 155)",
+          "oklch(87% 0.045 155)",
+          "oklch(95% 0.018 155)"
+        ]
+      },
+      "green-hover": {
+        "role": "primary",
+        "displayName": "Xanh nhấn sâu",
+        "tonalRamp": [
+          "oklch(15% 0.032 155)",
+          "oklch(27% 0.058 155)",
+          "oklch(39% 0.081 155)",
+          "oklch(51% 0.090 155)",
+          "oklch(63% 0.090 155)",
+          "oklch(75% 0.072 155)",
+          "oklch(87% 0.041 155)",
+          "oklch(95% 0.016 155)"
+        ]
+      },
+      "focus": {
+        "role": "primary",
+        "displayName": "Xanh tiêu điểm",
+        "tonalRamp": [
+          "oklch(15% 0.038 155)",
+          "oklch(27% 0.072 155)",
+          "oklch(39% 0.099 155)",
+          "oklch(51% 0.110 155)",
+          "oklch(63% 0.110 155)",
+          "oklch(75% 0.088 155)",
+          "oklch(87% 0.050 155)",
+          "oklch(95% 0.020 155)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Giấy sáng",
+        "tonalRamp": [
+          "oklch(15% 0.003 145)",
+          "oklch(27% 0.006 145)",
+          "oklch(39% 0.008 145)",
+          "oklch(51% 0.009 145)",
+          "oklch(63% 0.009 145)",
+          "oklch(75% 0.007 145)",
+          "oklch(87% 0.004 145)",
+          "oklch(95% 0.002 145)"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "Trắng bề mặt",
+        "tonalRamp": [
+          "oklch(15% 0.000 0)",
+          "oklch(27% 0.000 0)",
+          "oklch(39% 0.000 0)",
+          "oklch(51% 0.000 0)",
+          "oklch(63% 0.000 0)",
+          "oklch(75% 0.000 0)",
+          "oklch(87% 0.000 0)",
+          "oklch(95% 0.000 0)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Mực xanh đậm",
+        "tonalRamp": [
+          "oklch(15% 0.009 165)",
+          "oklch(27% 0.016 165)",
+          "oklch(39% 0.023 165)",
+          "oklch(51% 0.025 165)",
+          "oklch(63% 0.025 165)",
+          "oklch(75% 0.020 165)",
+          "oklch(87% 0.011 165)",
+          "oklch(95% 0.004 165)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Xám xanh",
+        "tonalRamp": [
+          "oklch(15% 0.007 155)",
+          "oklch(27% 0.013 155)",
+          "oklch(39% 0.018 155)",
+          "oklch(51% 0.020 155)",
+          "oklch(63% 0.020 155)",
+          "oklch(75% 0.016 155)",
+          "oklch(87% 0.009 155)",
+          "oklch(95% 0.004 155)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Đường phân cách",
+        "tonalRamp": [
+          "oklch(15% 0.005 150)",
+          "oklch(27% 0.008 150)",
+          "oklch(39% 0.012 150)",
+          "oklch(51% 0.013 150)",
+          "oklch(63% 0.013 150)",
+          "oklch(75% 0.010 150)",
+          "oklch(87% 0.006 150)",
+          "oklch(95% 0.002 150)"
+        ]
+      },
+      "soft": {
+        "role": "neutral",
+        "displayName": "Xanh dịu",
+        "tonalRamp": [
+          "oklch(15% 0.008 150)",
+          "oklch(27% 0.014 150)",
+          "oklch(39% 0.020 150)",
+          "oklch(51% 0.022 150)",
+          "oklch(63% 0.022 150)",
+          "oklch(75% 0.018 150)",
+          "oklch(87% 0.010 150)",
+          "oklch(95% 0.004 150)"
+        ]
+      },
+      "amber": {
+        "role": "status",
+        "displayName": "Hổ phách",
+        "tonalRamp": [
+          "oklch(15% 0.035 65)",
+          "oklch(27% 0.065 65)",
+          "oklch(39% 0.090 65)",
+          "oklch(51% 0.100 65)",
+          "oklch(63% 0.100 65)",
+          "oklch(75% 0.080 65)",
+          "oklch(87% 0.045 65)",
+          "oklch(95% 0.018 65)"
+        ]
+      },
+      "warning-surface": {
+        "role": "status",
+        "displayName": "Nền cảnh báo",
+        "tonalRamp": [
+          "oklch(15% 0.021 75)",
+          "oklch(27% 0.039 75)",
+          "oklch(39% 0.054 75)",
+          "oklch(51% 0.060 75)",
+          "oklch(63% 0.060 75)",
+          "oklch(75% 0.048 75)",
+          "oklch(87% 0.027 75)",
+          "oklch(95% 0.011 75)"
+        ]
+      },
+      "red": {
+        "role": "status",
+        "displayName": "Đỏ lỗi",
+        "tonalRamp": [
+          "oklch(15% 0.056 24)",
+          "oklch(27% 0.104 24)",
+          "oklch(39% 0.144 24)",
+          "oklch(51% 0.160 24)",
+          "oklch(63% 0.160 24)",
+          "oklch(75% 0.128 24)",
+          "oklch(87% 0.072 24)",
+          "oklch(95% 0.029 24)"
+        ]
+      },
+      "error-surface": {
+        "role": "status",
+        "displayName": "Nền lỗi",
+        "tonalRamp": [
+          "oklch(15% 0.014 20)",
+          "oklch(27% 0.026 20)",
+          "oklch(39% 0.036 20)",
+          "oklch(51% 0.040 20)",
+          "oklch(63% 0.040 20)",
+          "oklch(75% 0.032 20)",
+          "oklch(87% 0.018 20)",
+          "oklch(95% 0.007 20)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Tiêu đề trang",
+        "purpose": "Tiêu đề dashboard; giảm còn 28px ở breakpoint 1150px."
+      },
+      "body": {
+        "displayName": "Nội dung Windows",
+        "purpose": "Segoe UI/Tahoma có chủ ý cho tiếng Việt và sử dụng ngoại tuyến."
+      },
+      "console": {
+        "displayName": "Kết quả thực thi",
+        "purpose": "Consolas cho nội dung đầu ra và nhật ký."
+      }
+    },
+    "shadows": [
+      {
+        "name": "toast",
+        "value": "0 8px 30px #1c302a26",
+        "purpose": "Thông báo nổi."
+      },
+      {
+        "name": "dialog",
+        "value": "0 20px 70px #0003",
+        "purpose": "Hộp thoại xác nhận trên backdrop #102d2366."
+      }
+    ],
+    "motion": [
+      {
+        "name": "overview-arrive",
+        "value": "0.45s cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Brightness 0.96 → 1; chỉ bật với prefers-reduced-motion: no-preference."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact-desktop-max",
+        "value": "1150px"
+      },
+      {
+        "name": "mobile-max",
+        "value": "700px"
+      },
+      {
+        "name": "wide-min",
+        "value": "1600px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Nút chính",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Thao tác chính có nhãn rõ nghĩa.",
+      "html": "<button class=\"ds-primary\">Chạy toàn bộ chu trình</button>",
+      "css": ".ds-primary{font:600 15px/1.55 'Segoe UI',Tahoma,sans-serif;border:1px solid var(--line,#dce4de);border-radius:8px;padding:10px 15px;min-height:44px;cursor:pointer;background:var(--green,#176c4c);border-color:var(--green,#176c4c);color:var(--white,#fff)}.ds-primary:hover{background:var(--green-hover,#105538)}.ds-primary:disabled{opacity:.55;cursor:wait}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-filter:focus-visible,.ds-nav a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--focus,#25835a);outline-offset:4px}"
+    },
+    {
+      "name": "Nút phụ",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Chạy tác vụ riêng hoặc hủy xác nhận.",
+      "html": "<button class=\"ds-secondary\">Hủy</button>",
+      "css": ".ds-secondary{font:600 15px/1.55 'Segoe UI',Tahoma,sans-serif;border:1px solid var(--line,#dce4de);border-radius:8px;padding:10px 15px;min-height:44px;cursor:pointer;background:var(--white,#fff);color:var(--ink,#1c302a)}.ds-secondary:hover{background:var(--soft,#e8f2eb);border-color:#9db7a6}.ds-secondary:disabled{opacity:.55;cursor:wait}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-filter:focus-visible,.ds-nav a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--focus,#25835a);outline-offset:4px}"
+    },
+    {
+      "name": "Trạng thái",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "Nhãn chữ cho trạng thái thành công, cảnh báo và lỗi; ví dụ minh họa.",
+      "html": "<span class=\"ds-badge\">Đã kết nối</span> <span class=\"ds-badge ds-warn\">Chưa có dữ liệu</span> <span class=\"ds-badge ds-error\">Mất kết nối</span>",
+      "css": ".ds-badge{display:inline-flex;padding:5px 10px;border-radius:6px;background:var(--soft,#e8f2eb);color:var(--green,#176c4c);font:600 12px/1.55 \"Segoe UI\",Tahoma,sans-serif}.ds-warn{background:var(--warning-surface,#fff1db);color:var(--amber,#86500d)}.ds-error{background:var(--error-surface,#fceced);color:var(--red,#b33437)}"
+    },
+    {
+      "name": "Bộ lọc nhật ký",
+      "kind": "input",
+      "refersTo": "log-filter",
+      "description": "Select gốc với nhãn truy cập.",
+      "html": "<select class=\"ds-filter\" aria-label=\"Lọc mức nhật ký\"><option>Tất cả mức</option><option>Thành công</option><option>Cảnh báo</option><option>Lỗi</option></select>",
+      "css": ".ds-filter{background:var(--white,#fff);border:1px solid var(--line,#dce4de);border-radius:7px;color:var(--muted,#5e7068);padding:7px;font:12px/1.55 \"Segoe UI\",Tahoma,sans-serif;min-height:38px}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-filter:focus-visible,.ds-nav a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--focus,#25835a);outline-offset:4px}"
+    },
+    {
+      "name": "Điều hướng",
+      "kind": "nav",
+      "refersTo": "navigation-active",
+      "description": "Trạng thái chọn bằng nền xanh, chữ và biểu tượng.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Điều hướng mẫu\"><a class=\"ds-selected\" href=\"#overview\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1.5\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\" rx=\"1.5\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"1.5\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\" rx=\"1.5\"/></svg>Tổng quan</a><a href=\"#logs\">Nhật ký</a></nav>",
+      "css": ".ds-nav{display:grid;gap:7px;font:15px/1.55 \"Segoe UI\",Tahoma,sans-serif}.ds-nav a{display:flex;gap:12px;align-items:center;padding:11px 13px;border-radius:8px;color:#50665b;text-decoration:none}.ds-nav a:hover{text-decoration:underline;text-underline-offset:5px}.ds-nav .ds-selected{background:var(--green,#176c4c);color:var(--white,#fff);font-weight:600}.ds-nav svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-filter:focus-visible,.ds-nav a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--focus,#25835a);outline-offset:4px}"
+    },
+    {
+      "name": "Vùng thông tin",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Bề mặt phẳng có đường viền; nội dung minh họa trạng thái chưa tải.",
+      "html": "<section class=\"ds-card\" aria-label=\"Thông tin hệ thống mẫu\"><h2>Ổ đĩa OneDrive</h2><p>Đang đọc cấu hình kết nối…</p></section>",
+      "css": ".ds-card{background:var(--white,#fff);border:1px solid var(--line,#dce4de);border-radius:var(--radius,14px);padding:25px 27px;color:var(--ink,#1c302a);font:15px/1.55 \"Segoe UI\",Tahoma,sans-serif}.ds-card h2{font-size:20px;margin:0 0 4px}.ds-card p{font-size:13px;margin:0;color:var(--muted,#5e7068)}"
+    },
+    {
+      "name": "Hộp thoại xác nhận",
+      "kind": "custom",
+      "refersTo": "confirmation-dialog",
+      "description": "Bản xem trước hộp thoại; ứng dụng dùng showModal và tập trung nút Hủy.",
+      "html": "<section class=\"ds-dialog\" role=\"dialog\" aria-labelledby=\"ds-confirm-title\" aria-describedby=\"ds-confirm-text\"><h2 id=\"ds-confirm-title\">Xác nhận chạy tác vụ</h2><p id=\"ds-confirm-text\">Tác vụ sẽ thay thế lịch E5 hiện có và đăng ký lịch tự động.</p><div class=\"ds-dialog-buttons\"><button>Hủy</button><button class=\"ds-confirm\">Xác nhận chạy</button></div></section>",
+      "css": ".ds-dialog{border:0;border-radius:16px;padding:28px;max-width:min(460px,90vw);box-shadow:0 20px 70px #0003;background:var(--white,#fff);color:var(--ink,#1c302a);font:15px/1.55 \"Segoe UI\",Tahoma,sans-serif}.ds-dialog h2{font-size:18px;line-height:1.4;font-weight:650;margin:0;letter-spacing:-.3px}.ds-dialog p{color:var(--muted,#5e7068);margin:12px 0 22px;font-size:14px}.ds-dialog-buttons{display:flex;justify-content:flex-end;gap:10px}.ds-dialog button{font:600 15px/1.55 'Segoe UI',Tahoma,sans-serif;border:1px solid var(--line,#dce4de);border-radius:8px;padding:10px 15px;min-height:44px;cursor:pointer;background:var(--white,#fff);color:var(--ink,#1c302a)}.ds-dialog button:hover{background:var(--soft,#e8f2eb);border-color:#9db7a6}.ds-dialog .ds-confirm{background:var(--green,#176c4c);color:var(--white,#fff);border-color:var(--green,#176c4c)}.ds-dialog .ds-confirm:hover{background:var(--green-hover,#105538)}.ds-primary:focus-visible,.ds-secondary:focus-visible,.ds-filter:focus-visible,.ds-nav a:focus-visible,.ds-dialog button:focus-visible{outline:3px solid var(--focus,#25835a);outline-offset:4px}"
+    },
+    {
+      "name": "Kết quả thực thi",
+      "kind": "custom",
+      "description": "Vùng đầu ra monospace cuộn và ngắt dòng.",
+      "html": "<section class=\"ds-console\" aria-label=\"Kết quả mẫu\"><h2>Kết quả thực thi</h2><pre tabindex=\"0\">Sẵn sàng nhận tác vụ.\nChọn một thao tác để xem kết quả tại đây.</pre><p role=\"status\">Chưa có tác vụ đang chạy</p></section>",
+      "css": ".ds-console{border-radius:var(--radius,14px);background:var(--ink,#1c302a);color:#e1ece4;overflow:hidden}.ds-console h2{padding:16px 20px;margin:0;border-bottom:1px solid #395046;font:650 15px/1.4 \"Segoe UI\",Tahoma,sans-serif;color:#fff}.ds-console pre{margin:0;padding:20px;min-height:145px;max-height:340px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.8 Consolas,monospace;color:#e3eee7}.ds-console pre:focus-visible{outline:3px solid var(--focus,#25835a);outline-offset:-4px}.ds-console p{margin:0;padding:0 20px 17px;color:#bed0c3;font:12px/1.55 \"Segoe UI\",Tahoma,sans-serif}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Bàn điều khiển cục bộ",
+    "overview": "Giao diện sáng, rõ ràng và tiết chế dành cho người vận hành trên Windows. Điểm nhấn xanh lá dẫn mắt đến thao tác chính và trạng thái sẵn sàng; nền trung tính giúp đọc thông tin tiếng Việt trong phiên làm việc dài.\n\nTài liệu ghi nhận thiết kế đã triển khai trong `dashboard/dashboard.template.html`. Các token ở đầu tệp là quy chuẩn; phần diễn giải hướng dẫn áp dụng. Tên gọi mô tả thiết kế hiện có, không bổ sung một hướng mỹ thuật mới.",
+    "keyCharacteristics": [
+      "Nền sáng, xanh lá làm điểm nhấn.",
+      "Tiếng Việt rõ nghĩa, trạng thái có nhãn chữ.",
+      "Bề mặt phẳng, đường phân cách nhẹ.",
+      "Phông hệ thống hoạt động ngoại tuyến."
+    ],
+    "rules": [
+      {
+        "name": "The Nhãn trạng thái Rule",
+        "body": "Luôn hiển thị ý nghĩa trạng thái bằng chữ; màu không thay thế nhãn.",
+        "section": "colors"
+      },
+      {
+        "name": "The Bề mặt phẳng Rule",
+        "body": "Giữ vùng dữ liệu và danh sách không có bóng; chỉ lớp nổi cần tách khỏi nội dung dùng bóng.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do giữ nền sáng, điểm nhấn xanh lá và nội dung tiếng Việt.",
+      "Do dùng dữ liệu thực; biểu thị đang tải, mất kết nối và chưa có dữ liệu rõ ràng.",
+      "Do duy trì nhãn trạng thái, focus bàn phím và hộp thoại xác nhận có mô tả hệ quả.",
+      "Do kiểm tra bố cục ở (1440px) và (390px) khi mở rộng giao diện."
+    ],
+    "donts": [
+      "Don't thay số liệu chưa tải bằng dữ liệu thành công giả.",
+      "Don't dùng riêng màu sắc để truyền đạt lỗi hoặc cảnh báo.",
+      "Don't bỏ qua xác nhận trước tác vụ thay đổi dữ liệu hoặc lịch chạy.",
+      "Don't thêm phông cần mạng cho dashboard vận hành ngoại tuyến."
+    ]
+  }
+}

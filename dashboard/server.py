@@ -25,6 +25,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 LOG_DIR = ROOT_DIR / "logs"
 CONFIG_FILE = ROOT_DIR / "config" / "config.json"
 HTML_FILE = Path(__file__).resolve().parent / "Dashboard.html"
+TEMPLATE_FILE = Path(__file__).resolve().parent / "dashboard.template.html"
 MAX_REQUEST_BODY_BYTES = 4 * 1024
 
 LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -57,8 +58,11 @@ def get_telemetry():
 
     # Check tasks via PowerShell
     tasks_info = []
+    tasks_error = None
     try:
         ps_cmd = (
+            "$ErrorActionPreference = 'Stop'; "
+            "[Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false); "
             'Get-ScheduledTask | Where-Object { $_.TaskName -like "*E5*" } |'
             " ForEach-Object { $info = Get-ScheduledTaskInfo -TaskName"
             " $_.TaskName -ErrorAction SilentlyContinue; [PSCustomObject]@{ Name ="
@@ -71,9 +75,12 @@ def get_telemetry():
             ["powershell", "-NoProfile", "-Command", ps_cmd],
             capture_output=True,
             text=True,
+            encoding="utf-8",
             timeout=8,
             check=False,
         )
+        if proc.returncode != 0:
+            raise OSError("Task Scheduler query failed")
         if proc.stdout.strip():
             raw = json.loads(proc.stdout)
             if isinstance(raw, list):
@@ -82,6 +89,7 @@ def get_telemetry():
                 tasks_info = [raw]
     except (OSError, subprocess.TimeoutExpired, json.JSONDecodeError) as exc:
         LOGGER.warning("Error querying task scheduler: %s", exc)
+        tasks_error = "Không đọc được lịch chạy. Kiểm tra quyền truy cập Task Scheduler rồi cập nhật lại."
 
     # Count successes, warnings, errors from logs
     success_count = 0
@@ -130,6 +138,7 @@ def get_telemetry():
         "DriveLetter": drive_letter,
         "MountRemote": mount_remote,
         "Tasks": tasks_info,
+        "TasksError": tasks_error,
         "SuccessCount": success_count,
         "WarnCount": warn_count,
         "ErrorCount": error_count,
@@ -272,6 +281,18 @@ def execute_action_command(action_name: str) -> dict:
         }
 
     LOGGER.info("Executing dashboard action [%s]", action_name)
+    if cmd[0] == "powershell.exe":
+        # Windows PowerShell defaults to the OEM code page on redirected stdout.
+        file_index = cmd.index("-File")
+        quoted_args = " ".join(
+            "'" + value.replace("'", "''") + "'" if not value.startswith("-") else value
+            for value in cmd[file_index + 1 :]
+        )
+        cmd = cmd[:file_index] + [
+            "-Command",
+            "[Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false); "
+            "$OutputEncoding = [Console]::OutputEncoding; & " + quoted_args,
+        ]
     try:
         proc = subprocess.run(
             cmd,
@@ -282,6 +303,7 @@ def execute_action_command(action_name: str) -> dict:
             timeout=300,
             check=False,
             cwd=ROOT_DIR,
+            env={**os.environ, "PYTHONIOENCODING": "utf-8"},
         )
         output = (proc.stdout + "\n" + proc.stderr).strip()
         return {
@@ -378,6 +400,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 )
             )
 
+        elif path == "/favicon.ico":
+            self.send_response(204)
+            self.end_headers()
+
         elif path in ["/", "/index.html", "/Dashboard.html"]:
             # Regenerate or read HTML
             if HTML_FILE.exists():
@@ -464,27 +490,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
 
 def ensure_dashboard_html():
-    """Build the local HTML after checkout, where generated files are ignored."""
-    if HTML_FILE.exists():
-        return
-
-    subprocess.run(
-        [
-            "powershell.exe",
-            "-NoProfile",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-File",
-            str(ROOT_DIR / "dashboard" / "E5-Dashboard.ps1"),
-            "-NoServe",
-            "-NoBrowser",
-        ],
-        cwd=ROOT_DIR,
-        check=True,
-        timeout=60,
+    """Refresh the generated page from the versioned UTF-8 source every startup."""
+    HTML_FILE.write_text(
+        TEMPLATE_FILE.read_text(encoding="utf-8-sig"), encoding="utf-8"
     )
-    if not HTML_FILE.is_file():
-        raise FileNotFoundError(f"Dashboard generation did not create {HTML_FILE}")
 
 
 def start_server(port=PORT, open_browser=True):

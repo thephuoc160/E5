@@ -31,3 +31,9 @@ scratch_drive_sim/
 scratch_sp_test/
 scratch/
 shortcuts/
+
+# Browser verification artifacts (can contain local account and log data)
+.playwright-cli/
+output/playwright/
+.impeccable/review/
+.impeccable/questions/
