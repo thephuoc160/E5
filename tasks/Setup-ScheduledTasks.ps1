@@ -19,7 +19,6 @@ $RootDir = Split-Path -Parent $ScriptDir
 
 $MountBat = Join-Path $RootDir "#1.M_Drive.bat"
 $ActivityBat = Join-Path $RootDir "#2.run_activity.bat"
-$RunAllBat = Join-Path $RootDir "Run-All.bat"
 $PythonScript = Join-Path $RootDir "python\PingE5_App.py"
 
 Write-Host ""

@@ -73,13 +73,13 @@ foreach ($pair in $syncPairs) {
     }
 
     $roboArgs = @(
-        "`"$src`"",
-        "`"$dst`"",
+        $src,
+        $dst,
         "/MIR",
         "/COPY:DAT",
         "/R:3",
         "/W:5",
-        "/LOG+:`"$LogFile`"",
+        "/LOG+:$LogFile",
         "/NP",
         "/TEE",
         "/NDL"
@@ -90,8 +90,7 @@ foreach ($pair in $syncPairs) {
         Write-Host "  [Chế độ kiểm tra WhatIf / Preview]" -ForegroundColor Cyan
     }
 
-    $cmd = "robocopy " + ($roboArgs -join " ")
-    Invoke-Expression $cmd
+    & robocopy.exe @roboArgs
     $exitCode = $LASTEXITCODE
 
     # Robocopy exit code interpretation:

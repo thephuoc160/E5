@@ -32,15 +32,8 @@
       "Automated Health Check"
     ],
     "plannerTaskDueInDays": 3,
-    "appRegistrationNames": [
-      "My_Copilot_Dev"
-    ],
     "sharePointSiteId": "yourdomain.sharepoint.com,site-id,web-id",
-    "sharePointLibraryFolder": "CopilotAutomation",
-    "mailboxRuleName": "Copilot Auto Archive",
-    "mailboxRuleSubjectContains": "Copilot",
-    "mailboxRuleTargetFolderPath": "Inbox/Copilot Archive",
-    "userSnapshotReportPath": "M:\\API\\user_snapshot.json"
+    "sharePointLibraryFolder": "CopilotAutomation"
   },
   "rclone": {
     "driveLetter": "M:",
@@ -55,6 +48,7 @@
   "settings": {
     "minActivities": 15,
     "maxActivities": 25,
-    "logRetentionDays": 30
+    "logRetentionDays": 30,
+    "allowRemoteCleanup": false
   }
 }

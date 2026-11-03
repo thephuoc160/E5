@@ -1,0 +1,51 @@
+name: Code quality
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: python/requirements.lock
+      - name: Install runtime and verification tools
+        run: python -m pip install --disable-pip-version-check -r python/requirements-dev.txt
+      - name: Lint Python
+        run: ruff check .
+      - name: Check Python formatting
+        run: ruff format --check .
+      - name: Run regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Audit Python dependencies
+        run: pip-audit -r python/requirements.lock
+      - name: Scan Python security issues
+        run: bandit -q -ll -r .github/scripts dashboard python -x tests
+      - name: Parse PowerShell scripts
+        shell: pwsh
+        run: |
+          $parseFailed = $false
+          Get-ChildItem -Recurse -File -Filter '*.ps1' | ForEach-Object {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              $_.FullName,
+              [ref]$tokens,
+              [ref]$errors
+            ) | Out-Null
+            if ($errors.Count -gt 0) {
+              $parseFailed = $true
+              $errors | ForEach-Object { Write-Error $_.Message }
+            }
+          }
+          if ($parseFailed) { exit 1 }

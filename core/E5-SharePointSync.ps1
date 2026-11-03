@@ -107,7 +107,7 @@ $activityPool = @(
     @{
         Name = "Tạo & Upload file test"
         Action = {
-            $tempDir = Join-Path $RootDir "scratch_sp_test"
+            $tempDir = Join-Path $RootDir "scratch\sharepoint"
             if (-not (Test-Path $tempDir)) { New-Item -ItemType Directory -Path $tempDir -Force | Out-Null }
             $testFileName = "sp_ping_{0}.txt" -f (Get-Date -Format "yyyyMMdd_HHmmss")
             $testFile = Join-Path $tempDir $testFileName

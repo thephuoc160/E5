@@ -1,6 +1,4 @@
 @echo off
-title Microsoft 365 E5 Renew - Master Runner
-cd /d "%~dp0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "Run-All.ps1"
-echo.
-pause
+rem Compatibility entry point. Edit launchers\Run-All.bat instead.
+call "%~dp0launchers\Run-All.bat" %*
+exit /b %errorlevel%

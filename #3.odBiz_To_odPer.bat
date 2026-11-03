@@ -1,5 +1,4 @@
 @echo off
-cd /d "%~dp0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "core\E5-OneDriveSync.ps1"
-echo.
-pause
+rem Compatibility entry point. Edit launchers\Sync-OneDrive.bat instead.
+call "%~dp0launchers\Sync-OneDrive.bat" %*
+exit /b %errorlevel%

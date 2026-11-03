@@ -4,26 +4,27 @@ e5_cloud_runner.py - Microsoft 365 E5 Cloud Automation Runner for GitHub Actions
 Standard library only (zero external pip dependencies) for ultra-fast, robust execution.
 """
 
+import datetime
+import json
 import os
 import sys
-import json
 import time
-import random
-import datetime
-import urllib.request
-import urllib.parse
 import urllib.error
+import urllib.parse
+import urllib.request
 
-if hasattr(sys.stdout, 'reconfigure'):
-    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
-if hasattr(sys.stderr, 'reconfigure'):
-    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 
 def log(msg, level="INFO"):
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     symbols = {"INFO": "ℹ️", "SUCCESS": "✅", "WARN": "⚠️", "ERROR": "❌"}
     sym = symbols.get(level, "🔹")
     print(f"[{ts}] [{level}] {sym} {msg}", flush=True)
+
 
 class GraphCloudClient:
     def __init__(self, tenant_id, client_id, client_secret, upn):
@@ -41,29 +42,41 @@ class GraphCloudClient:
             "planner_ops": 0,
             "directory_ops": 0,
             "total_requests": 0,
-            "errors": 0
+            "errors": 0,
         }
 
     def get_token(self):
         """Authenticate via OAuth 2.0 Client Credentials flow"""
-        token_url = f"https://login.microsoftonline.com/{self.tenant_id}/oauth2/v2.0/token"
-        data = urllib.parse.urlencode({
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-            "scope": "https://graph.microsoft.com/.default",
-            "grant_type": "client_credentials"
-        }).encode("utf-8")
+        token_url = (
+            f"https://login.microsoftonline.com/{self.tenant_id}/oauth2/v2.0/token"
+        )
+        data = urllib.parse.urlencode(
+            {
+                "client_id": self.client_id,
+                "client_secret": self.client_secret,
+                "scope": "https://graph.microsoft.com/.default",
+                "grant_type": "client_credentials",
+            }
+        ).encode("utf-8")
 
         req = urllib.request.Request(token_url, data=data, method="POST")
         req.add_header("Content-Type", "application/x-www-form-urlencoded")
 
         try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            # The URL is a fixed Microsoft HTTPS host; no user-selected scheme.
+            with urllib.request.urlopen(req, timeout=15) as resp:  # nosec B310
                 res_body = json.loads(resp.read().decode("utf-8"))
                 self.access_token = res_body.get("access_token")
+                if not self.access_token:
+                    raise ValueError(
+                        "Token endpoint response did not contain an access token"
+                    )
                 self.metrics["token_acquired"] = True
                 self.metrics["total_requests"] += 1
-                log("Đăng nhập Microsoft Entra ID thành công! Đã cấp token Graph API.", "SUCCESS")
+                log(
+                    "Đăng nhập Microsoft Entra ID thành công! Đã cấp token Graph API.",
+                    "SUCCESS",
+                )
                 return True
         except Exception as e:
             self.metrics["errors"] += 1
@@ -72,17 +85,22 @@ class GraphCloudClient:
 
     def request(self, method, endpoint, body=None, custom_headers=None):
         """Standardized HTTP Request to Microsoft Graph"""
+        if not endpoint.startswith("/"):
+            raise ValueError("Microsoft Graph endpoint must be a relative path")
+
         if not self.access_token:
             if not self.get_token():
                 return None
 
-        url = f"https://graph.microsoft.com/v1.0{endpoint}" if endpoint.startswith("/") else endpoint
+        url = f"https://graph.microsoft.com/v1.0{endpoint}"
         data = json.dumps(body).encode("utf-8") if body else None
 
         req = urllib.request.Request(url, data=data, method=method)
         req.add_header("Authorization", f"Bearer {self.access_token}")
         req.add_header("Content-Type", "application/json")
-        req.add_header("User-Agent", "E5Renew-GitHubAction-Runner/2.5 (Automated Cloud CI/CD)")
+        req.add_header(
+            "User-Agent", "E5Renew-GitHubAction-Runner/2.5 (Automated Cloud CI/CD)"
+        )
 
         if custom_headers:
             for k, v in custom_headers.items():
@@ -91,22 +109,25 @@ class GraphCloudClient:
         for attempt in range(3):
             try:
                 self.metrics["total_requests"] += 1
-                with urllib.request.urlopen(req, timeout=20) as resp:
+                # The URL is constructed from the fixed Graph HTTPS host above.
+                with urllib.request.urlopen(req, timeout=20) as resp:  # nosec B310
                     status = resp.status
                     if status == 204 or resp.headers.get("Content-Length") == "0":
                         return {}
                     content = resp.read().decode("utf-8")
                     return json.loads(content) if content else {}
             except urllib.error.HTTPError as e:
-                err_content = e.read().decode("utf-8", errors="ignore")
                 if e.code == 429 or e.code >= 500:
                     wait_sec = (attempt + 1) * 3
-                    log(f"HTTP {e.code} gặp rate-limit/lỗi server. Thử lại sau {wait_sec}s...", "WARN")
+                    log(
+                        f"HTTP {e.code} gặp rate-limit/lỗi server. Thử lại sau {wait_sec}s...",
+                        "WARN",
+                    )
                     time.sleep(wait_sec)
                     continue
                 else:
                     self.metrics["errors"] += 1
-                    log(f"HTTP {e.code} khi gọi {endpoint}: {err_content[:200]}", "WARN")
+                    log(f"HTTP {e.code} khi gọi {endpoint}.", "WARN")
                     return None
             except Exception as ex:
                 self.metrics["errors"] += 1
@@ -117,7 +138,7 @@ class GraphCloudClient:
     def run_directory_audit_ops(self):
         """1. Query Directory, Subscribed SKUs and Organization info"""
         log("Đang truy vấn thông tin License E5 & Microsoft Entra ID...", "INFO")
-        
+
         # Subscribed SKUs
         skus = self.request("GET", "/subscribedSkus")
         if skus and "value" in skus:
@@ -126,61 +147,67 @@ class GraphCloudClient:
                 sku_part = item.get("skuPartNumber", "Unknown")
                 prepaid = item.get("prepaidUnits", {}).get("enabled", 0)
                 consumed = item.get("consumedUnits", 0)
-                log(f"Gói bản quyền: {sku_part} (Đã cấp: {consumed}/{prepaid})", "SUCCESS")
+                log(
+                    f"Gói bản quyền: {sku_part} (Đã cấp: {consumed}/{prepaid})",
+                    "SUCCESS",
+                )
 
         # Directory roles
         roles = self.request("GET", "/directoryRoles")
         if roles:
             self.metrics["directory_ops"] += 1
-            log(f"Đã kiểm tra {len(roles.get('value', []))} vai trò quản trị Directory Roles.", "SUCCESS")
+            log(
+                f"Đã kiểm tra {len(roles.get('value', []))} vai trò quản trị Directory Roles.",
+                "SUCCESS",
+            )
 
     def run_batch_operations(self):
         """2. Advanced JSON Batching Request ($batch)"""
         log("Đang thực thi Microsoft Graph JSON Batching Request ($batch)...", "INFO")
-        
+
         batch_payload = {
             "requests": [
-                {
-                    "id": "1",
-                    "method": "GET",
-                    "url": f"/users/{self.upn}"
-                },
+                {"id": "1", "method": "GET", "url": f"/users/{self.upn}"},
                 {
                     "id": "2",
                     "method": "GET",
-                    "url": f"/users/{self.upn}/messages?$top=5&$select=subject,receivedDateTime,from"
+                    "url": f"/users/{self.upn}/messages?$top=5&$select=subject,receivedDateTime,from",
                 },
-                {
-                    "id": "3",
-                    "method": "GET",
-                    "url": "/organization"
-                },
-                {
-                    "id": "4",
-                    "method": "GET",
-                    "url": f"/users/{self.upn}/drive"
-                }
+                {"id": "3", "method": "GET", "url": "/organization"},
+                {"id": "4", "method": "GET", "url": f"/users/{self.upn}/drive"},
             ]
         }
 
         resp = self.request("POST", "/$batch", body=batch_payload)
         if resp and "responses" in resp:
             self.metrics["batch_calls"] += 1
-            success_count = sum(1 for r in resp["responses"] if 200 <= r.get("status", 0) < 300)
-            log(f"JSON Batching hoàn tất: {success_count}/{len(resp['responses'])} sub-requests thành công!", "SUCCESS")
+            success_count = sum(
+                1 for r in resp["responses"] if 200 <= r.get("status", 0) < 300
+            )
+            log(
+                f"JSON Batching hoàn tất: {success_count}/{len(resp['responses'])} sub-requests thành công!",
+                "SUCCESS",
+            )
         else:
             log("Batch request không phản hồi thành công.", "WARN")
 
     def run_delta_queries(self):
         """3. Delta Query (Incremental Change Tracking)"""
-        log("Đang thực thi Delta Queries theo dõi thay đổi gia tăng (/delta)...", "INFO")
-        
+        log(
+            "Đang thực thi Delta Queries theo dõi thay đổi gia tăng (/delta)...", "INFO"
+        )
+
         # Inbox Messages Delta
-        msg_delta = self.request("GET", f"/users/{self.upn}/mailFolders/inbox/messages/delta?$top=5")
+        msg_delta = self.request(
+            "GET", f"/users/{self.upn}/mailFolders/inbox/messages/delta?$top=5"
+        )
         if msg_delta:
             self.metrics["delta_queries"] += 1
             items = len(msg_delta.get("value", []))
-            log(f"Delta Query (Inbox): Nhận diện {items} tin nhắn cập nhật mới.", "SUCCESS")
+            log(
+                f"Delta Query (Inbox): Nhận diện {items} tin nhắn cập nhật mới.",
+                "SUCCESS",
+            )
 
         # Drive Root Delta
         drive_delta = self.request("GET", f"/users/{self.upn}/drive/root/delta?$top=5")
@@ -192,7 +219,7 @@ class GraphCloudClient:
     def run_mail_operations(self):
         """4. Mail Operations: Send Dev Notification Email"""
         log("Đang thực hiện tác vụ gửi Email mô phỏng hoạt động phát triển...", "INFO")
-        
+
         subject = f"[CI/CD E5 Developer Activity] Automated Graph Test - {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}"
         body_content = f"""
         <html>
@@ -200,7 +227,7 @@ class GraphCloudClient:
             <h2 style="color: #4f46e5;">Microsoft 365 E5 Developer Automated Verification</h2>
             <p>Email này được kích hoạt tự động từ <b>GitHub Actions CI/CD Pipeline</b> để xác minh trạng thái tương tác Microsoft Graph API.</p>
             <table style="border-collapse: collapse; width: 100%; max-width: 500px; margin: 15px 0;">
-                <tr style="background-color: #f3f4f6;"><td style="padding: 8px; border: 1px solid #ddd;"><b>Thời gian</b></td><td style="padding: 8px; border: 1px solid #ddd;">{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} UTC</td></tr>
+                <tr style="background-color: #f3f4f6;"><td style="padding: 8px; border: 1px solid #ddd;"><b>Thời gian</b></td><td style="padding: 8px; border: 1px solid #ddd;">{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")} UTC</td></tr>
                 <tr><td style="padding: 8px; border: 1px solid #ddd;"><b>Tài khoản</b></td><td style="padding: 8px; border: 1px solid #ddd;">{self.upn}</td></tr>
                 <tr style="background-color: #f3f4f6;"><td style="padding: 8px; border: 1px solid #ddd;"><b>Môi trường</b></td><td style="padding: 8px; border: 1px solid #ddd;">GitHub Cloud Runner</td></tr>
             </table>
@@ -212,15 +239,10 @@ class GraphCloudClient:
         send_payload = {
             "message": {
                 "subject": subject,
-                "body": {
-                    "contentType": "HTML",
-                    "content": body_content
-                },
-                "toRecipients": [
-                    {"emailAddress": {"address": self.upn}}
-                ]
+                "body": {"contentType": "HTML", "content": body_content},
+                "toRecipients": [{"emailAddress": {"address": self.upn}}],
             },
-            "saveToSentItems": "true"
+            "saveToSentItems": "true",
         }
 
         res = self.request("POST", f"/users/{self.upn}/sendMail", body=send_payload)
@@ -236,21 +258,28 @@ class GraphCloudClient:
             msg_payload = {
                 "body": {
                     "contentType": "html",
-                    "content": f"🚀 <b>[Cloud CI/CD]</b> Hoạt động Microsoft Graph API đã được kiểm thử tự động từ GitHub Actions vào lúc <i>{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</i>."
+                    "content": f"🚀 <b>[Cloud CI/CD]</b> Hoạt động Microsoft Graph API đã được kiểm thử tự động từ GitHub Actions vào lúc <i>{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</i>.",
                 }
             }
-            res = self.request("POST", f"/teams/{team_id}/channels/{channel_id}/messages", body=msg_payload)
+            res = self.request(
+                "POST",
+                f"/teams/{team_id}/channels/{channel_id}/messages",
+                body=msg_payload,
+            )
             if res:
                 self.metrics["teams_ops"] += 1
                 log("Đã gửi tin nhắn Teams thành công!", "SUCCESS")
 
         # Planner Tasks
         if plan_id:
-            log(f"Đang truy vấn danh sách Planner Tasks...", "INFO")
+            log("Đang truy vấn danh sách Planner Tasks...", "INFO")
             tasks = self.request("GET", f"/planner/plans/{plan_id}/tasks")
             if tasks:
                 self.metrics["planner_ops"] += 1
-                log(f"Đã đọc {len(tasks.get('value', []))} tasks từ Planner.", "SUCCESS")
+                log(
+                    f"Đã đọc {len(tasks.get('value', []))} tasks từ Planner.", "SUCCESS"
+                )
+
 
 def write_github_summary(metrics, duration_sec):
     """Write rich GitHub Step Summary for GitHub Actions Web UI"""
@@ -267,14 +296,14 @@ def write_github_summary(metrics, duration_sec):
 
 | Chỉ Số Telemetry | Giá Trị Ghi Nhận | Trạng Thái |
 | :--- | :---: | :---: |
-| 🔑 **Xác Thực Entra ID Token** | OAuth 2.0 Client Credentials | {'🟢 Thành công' if metrics['token_acquired'] else '🔴 Thất bại'} |
-| 📦 **JSON Batching Requests (`$batch`)** | `{metrics['batch_calls']}` Batch calls | 🟢 Hoàn tất |
-| 🔄 **Delta Queries (`/delta`)** | `{metrics['delta_queries']}` Queries | 🟢 Hoàn tất |
-| ✉️ **Outlook & Mail API** | `{metrics['mail_ops']}` Gửi Mail | 🟢 Hoàn tất |
-| 💬 **Teams & Collaboration** | `{metrics['teams_ops']}` Hoạt động | 🟢 Hoàn tất |
-| 📋 **Planner & To-Do** | `{metrics['planner_ops']}` Hoạt động | 🟢 Hoàn tất |
-| 🏢 **Directory & Subscribed SKUs** | `{metrics['directory_ops']}` Truy vấn | 🟢 Hoàn tất |
-| 🌐 **Tổng số API Request** | `{metrics['total_requests']}` requests | 🟢 Tốt |
+| 🔑 **Xác Thực Entra ID Token** | OAuth 2.0 Client Credentials | {"🟢 Thành công" if metrics["token_acquired"] else "🔴 Thất bại"} |
+| 📦 **JSON Batching Requests (`$batch`)** | `{metrics["batch_calls"]}` Batch calls | 🟢 Hoàn tất |
+| 🔄 **Delta Queries (`/delta`)** | `{metrics["delta_queries"]}` Queries | 🟢 Hoàn tất |
+| ✉️ **Outlook & Mail API** | `{metrics["mail_ops"]}` Gửi Mail | 🟢 Hoàn tất |
+| 💬 **Teams & Collaboration** | `{metrics["teams_ops"]}` Hoạt động | 🟢 Hoàn tất |
+| 📋 **Planner & To-Do** | `{metrics["planner_ops"]}` Hoạt động | 🟢 Hoàn tất |
+| 🏢 **Directory & Subscribed SKUs** | `{metrics["directory_ops"]}` Truy vấn | 🟢 Hoàn tất |
+| 🌐 **Tổng số API Request** | `{metrics["total_requests"]}` requests | 🟢 Tốt |
 | ⏱️ **Thời gian thực thi** | `{duration_sec:.2f} giây` | 🟢 Nhanh |
 
 ---
@@ -285,6 +314,7 @@ def write_github_summary(metrics, duration_sec):
             f.write(md)
     except Exception as e:
         log(f"Không thể ghi GITHUB_STEP_SUMMARY: {e}", "WARN")
+
 
 def main():
     print("=" * 65)
@@ -300,15 +330,22 @@ def main():
     plan_id = os.environ.get("PLANNER_PLAN_ID", "").strip()
 
     if not tenant_id or not client_id or not client_secret:
-        log("LỖI: Thiếu biến môi trường AZURE_TENANT_ID, AZURE_CLIENT_ID hoặc AZURE_CLIENT_SECRET!", "ERROR")
-        log("Vui lòng cấu hình các Secrets trong GitHub Repository Settings -> Secrets and variables -> Actions.", "WARN")
+        log(
+            "LỖI: Thiếu biến môi trường AZURE_TENANT_ID, AZURE_CLIENT_ID hoặc AZURE_CLIENT_SECRET!",
+            "ERROR",
+        )
+        log(
+            "Vui lòng cấu hình các Secrets trong GitHub Repository Settings -> Secrets and variables -> Actions.",
+            "WARN",
+        )
         sys.exit(1)
 
     start_time = time.time()
     client = GraphCloudClient(tenant_id, client_id, client_secret, upn)
 
     # Execute all activities
-    if client.get_token():
+    token_acquired = client.get_token()
+    if token_acquired:
         client.run_directory_audit_ops()
         client.run_batch_operations()
         client.run_delta_queries()
@@ -319,9 +356,18 @@ def main():
     duration = time.time() - start_time
     write_github_summary(client.metrics, duration)
 
+    if not token_acquired:
+        log("Chu trình thất bại do không thể xác thực Microsoft Graph.", "ERROR")
+        return 1
+
     print("\n" + "=" * 65)
-    log(f"Chu trình hoàn tất trong {duration:.2f} giây với {client.metrics['total_requests']} API calls.", "SUCCESS")
+    log(
+        f"Chu trình hoàn tất trong {duration:.2f} giây với {client.metrics['total_requests']} API calls.",
+        "SUCCESS",
+    )
     print("=" * 65)
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

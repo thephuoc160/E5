@@ -1,4 +1,4 @@
 @echo off
-cd /d "%~dp0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "core\E5-RcloneMount.ps1" -Action Unmount
-pause
+rem Compatibility entry point. Edit launchers\Unmount-Drive.bat instead.
+call "%~dp0launchers\Unmount-Drive.bat" %*
+exit /b %errorlevel%
